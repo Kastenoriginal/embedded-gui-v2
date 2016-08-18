@@ -2,9 +2,19 @@ package core;
 
 public class Pin {
 
-    public static final String PIN_TYPE_I2C = "I2C";
-    public static final String PIN_TYPE_SPI = "SPI";
-    public static final String PIN_TYPE_GPIO = "GPIO";
+    public static final String I2C = "I2C";
+    public static final String SPI = "SPI";
+    public static final String GPIO = "GPIO";
+    public static final String GND = "GND";
+    public static final String PWR3 = "PWR3";
+    public static final String PWR5 = "PWR5";
+    public static final String UART = "UART";
+    public static final String EEPROM = "EEPROM";
+    public static final String PWR_BTN = "PWR_BTN";
+    public static final String SYS_RST = "SYS_RST";
+    public static final String PWM = "PWM";
+    public static final String AI = "AI";
+
     private int pinId;
     private String ioType;
     private String pinType;

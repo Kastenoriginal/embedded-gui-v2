@@ -34,6 +34,7 @@ public class MenuViewController {
     public final static String OBSERVABLE_SPI_TEXT = "SPI Message";
 
     private Root root;
+
     private MenuViewModel menuViewModel;
     private AlertsImpl alerts;
     private Validations validations;
@@ -44,7 +45,6 @@ public class MenuViewController {
     private Networking networking;
     private Logger logger;
     private int refreshRate = -1;
-
     @FXML
     private TextField ipAddressTextField;
 
@@ -70,13 +70,16 @@ public class MenuViewController {
     private CheckBox pinRequestCheckBox;
 
     @FXML
-    private TextField pinRequestTextField;
+    private TextField refreshRateTextField;
 
     @FXML
-    private Button pinRequestButton;
+    private Button updateRefreshRateButton;
 
     @FXML
-    private TextArea textArea;
+    public TextField addressTextField;
+
+    @FXML
+    private TextArea messagesTextArea;
 
     @FXML
     private ComboBox<String> textAreaComboBox;
@@ -103,8 +106,9 @@ public class MenuViewController {
 
     private void setAllValidationBorders() {
         validations.setIpAddressValidationBorder(ipAddressTextField);
-        validations.setPinRequestValidationBorder(pinRequestTextField);
-        validations.setTextAreaValidationBorder(textArea, -1);
+        validations.setPinRequestValidationBorder(refreshRateTextField);
+        validations.setTextAreaValidationBorder(messagesTextArea, -1);
+        validations.setAddressValidationBorder("", addressTextField);
     }
 
     @FXML
@@ -121,11 +125,12 @@ public class MenuViewController {
         embeddedTypeComboBox.setDisable(true);
         embeddedLayoutCheckBox.setDisable(false);
         pinRequestCheckBox.setDisable(false);
-        pinRequestTextField.setDisable(false);
+        refreshRateTextField.setDisable(false);
 //        pinRequestButton.setDisable(false);
         disconnectButton.requestFocus();
         if (event == null) {
             // TODO: 18.8.2016 NETWORK_OP
+            // TODO: 19.8.2016 mozno popup 
 //            boolean connected = networking.connect(selectedSystemIpFromComboBox);
 //            if (connected) {
             root.showEmbeddedLayout(selectedSystemTypeFromComboBox);
@@ -152,8 +157,8 @@ public class MenuViewController {
         }
         embeddedLayoutCheckBox.setDisable(true);
         pinRequestCheckBox.setDisable(true);
-        pinRequestTextField.setDisable(true);
-        pinRequestButton.setDisable(true);
+        refreshRateTextField.setDisable(true);
+        updateRefreshRateButton.setDisable(true);
         embeddedTypeComboBox.setDisable(false);
         ipAddressTextField.setDisable(false);
         disconnectButton.setDisable(true);
@@ -186,7 +191,7 @@ public class MenuViewController {
     }
 
     @FXML
-    private void chooseAvailableSystem() {
+    private void loadAvailableSystems() {
         try {
             if (embeddedListComboBox.getItems().isEmpty()) {
                 menuViewModel.readFileContent(true);
@@ -239,36 +244,36 @@ public class MenuViewController {
     @FXML
     private void toggleRequestPinStatus() {
         if (pinRequestCheckBox.isSelected()) {
-            pinRequestTextField.setDisable(false);
-            pinRequestButton.setDisable(false);
-            validatePinRequest();
+            refreshRateTextField.setDisable(false);
+            updateRefreshRateButton.setDisable(false);
+            validateAndChangeRefreshRate();
             List<Pin> pins = root.getCheckedPins();
             networking.startRequestPinStatus(refreshRate, pins);
             // TODO: 16.8.2016 from eclipse method setUiFromResponse (include in new Thread task if networking method below does not do it)
         } else {
-            pinRequestTextField.setDisable(true);
-            pinRequestButton.setDisable(true);
+            refreshRateTextField.setDisable(true);
+            updateRefreshRateButton.setDisable(true);
             networking.cancelRequestPinStatus();
         }
     }
 
     @FXML
-    private void validatePinRequest() {
-        boolean valid = validations.setPinRequestValidationBorder(pinRequestTextField);
+    private void validateAndChangeRefreshRate() {
+        boolean valid = validations.setPinRequestValidationBorder(refreshRateTextField);
         if (valid) {
-            pinRequestButton.setDisable(false);
+            updateRefreshRateButton.setDisable(false);
             pinRequestCheckBox.setDisable(false);
-            refreshRate = Integer.valueOf(pinRequestTextField.getText());
+            refreshRate = Integer.valueOf(refreshRateTextField.getText());
         } else {
-            pinRequestButton.setDisable(true);
+            updateRefreshRateButton.setDisable(true);
             pinRequestCheckBox.setDisable(true);
             refreshRate = -1;
         }
     }
 
     @FXML
-    private void changeStatusRefreshRate() {
-        String refreshRate = pinRequestTextField.getText();
+    private void changeRefreshRate() {
+        String refreshRate = refreshRateTextField.getText();
         networking.updateRequestRefreshRate(Integer.valueOf(refreshRate));
         logger.log("Refresh rate updated to " + refreshRate);
     }
@@ -303,7 +308,7 @@ public class MenuViewController {
     }
 
     @FXML
-    private void setSelectedSystemAvailable() throws IOException {
+    private void selectAvailableSystem() throws IOException {
         String selectedSystemType = embeddedListComboBox.getSelectionModel().getSelectedItem();
 
         if (selectedSystemType != null && !selectedSystemType.isEmpty() && (!selectedSystemType.equals(currentlySelectedSystemType) || disconnectButton.isDisabled())) {
@@ -324,11 +329,20 @@ public class MenuViewController {
     }
 
     @FXML
+    public void validatePhysicalAddress() {
+        String addressText = addressTextField.getText();
+        if (addressTextField.getText() == null || addressTextField.getText().isEmpty()) {
+            return;
+        }
+        validations.setAddressValidationBorder(addressText, addressTextField);
+    }
+
+    @FXML
     private void validateTextArea() {
         int textAreaSelectedItem = textAreaComboBox.getSelectionModel().getSelectedIndex();
-        String textAreaText = textArea.getText();
+        String textAreaText = messagesTextArea.getText();
 
-        validations.setTextAreaValidationBorder(textArea, textAreaSelectedItem);
+        validations.setTextAreaValidationBorder(messagesTextArea, textAreaSelectedItem);
 
         if (validations.isTextAreaValid(textAreaSelectedItem, textAreaText)) {
             sendButton.setDisable(false);
@@ -339,12 +353,27 @@ public class MenuViewController {
 
     @FXML
     private void sendTextAreaMessage() {
-        String textAreaText = textArea.getText();
+        String address = addressTextField.getText();
+        String textAreaText = messagesTextArea.getText();
+        boolean validateAddress = false;
+        if (textAreaText.contains("I2C") || textAreaText.contains("SPI")) {
+            validateAddress = true;
+        }
         switch (textAreaComboBox.getSelectionModel().getSelectedItem()) {
             case OBSERVABLE_MACRO_TEXT:
                 List<String> commands = Arrays.asList(textAreaText.split("\n"));
+                if (!validations.isTextAreaValid(0, textAreaText)) {
+                    logger.log("Commands are not valid");
+                    return;
+                }
+                if (validateAddress) {
+                    if (!validations.isPhysicalAddressValid(address)) {
+                        logger.log("Address is not valid");
+                        return;
+                    }
+                }
                 // TODO: 18.8.2016  vyvolaj popup
-                networking.sendMacro(commands);
+                networking.sendMacro(address, commands);
                 // TODO: 18.8.2016 zavri popup
                 break;
             case OBSERVABLE_I2C_TEXT:
@@ -358,12 +387,16 @@ public class MenuViewController {
         }
     }
 
+    public String getAddress() {
+        return addressTextField.getText();
+    }
+
     public String getCommandMode() {
         return textAreaComboBox.getSelectionModel().getSelectedItem();
     }
 
     public String getCommand() {
-        return textArea.getText();
+        return messagesTextArea.getText();
     }
 
     public boolean isSendRequestCheckBoxChecked() {

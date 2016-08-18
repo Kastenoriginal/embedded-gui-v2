@@ -68,7 +68,7 @@ public class Validations {
         }
     }
 
-    public void setI2CValidationBorder(String input, TextField textField) {
+    public void setAddressValidationBorder(String input, TextField textField) {
         if (isPhysicalAddressValid(input)) {
             textField.setStyle(GREEN_BORDER);
         } else {
@@ -138,8 +138,8 @@ public class Validations {
         return isDoubleHexaString(input);
     }
 
-    boolean isPhysicalAddressValid(String input) {
-        return isSingleHexaString(input) && (input.length() ==2 || input.length() == 3);
+    public boolean isPhysicalAddressValid(String input) {
+        return isSingleHexaString(input) && input.length() == 2;
     }
 
     public void setTextAreaValidationBorder(TextArea textarea, int item) {

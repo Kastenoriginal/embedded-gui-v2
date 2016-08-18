@@ -115,24 +115,23 @@ public class Networking {
         startRequestPinStatus(this.refreshRate, pins);
     }
 
-    public synchronized void sendMacro(List<String> commands) {
-        // TODO: 18.8.2016 send macro implementuje callable + pridat tam to co je v metode executecommand
+    public synchronized void sendMacro(String address, List<String> commands) {
+        // TODO: 18.8.2016 send macro implementuje callable na response
+        // TODO: 19.8.2016 to je stary flow novy je ze sa explicitne volaju metody ktore asi budu implementovat callable
         for (String command : commands) {
             command = command.substring(0, command.lastIndexOf(";"));
             logger.log("Sending: " + command);
-            sendMacroCommand(command);
+            sendMacroCommand(address, command);
         }
         logger.log("Macro sent.");
     }
 
-    private void sendMacroCommand(String command) {
+    private void sendMacroCommand(String address, String command) {
         if (validations.isOnlyDigitString(command)) {
             sleepThread(connectionService, Integer.valueOf(command));
         } else {
             int pinId;
             String hexaCommand;
-            // TODO: 18.8.2016 remove
-            String address = "TEMP_ADDRESS";
 
             if (command.startsWith("GPIO")) {
                 pinId = Integer.valueOf(command.substring(5, 7));
@@ -142,7 +141,6 @@ public class Networking {
                 pinId = Integer.valueOf(command.substring(4, 6));
                 hexaCommand = command.substring(6);
                 Pin pin = new Pin(pinId, "O", "I2C");
-                // TODO: 18.8.2016 get address
                 sendValueToI2CPin(pin, address, hexaCommand);
             } else if (command.startsWith("SPI")) {
                 pinId = Integer.valueOf(command.substring(4, 6));
@@ -165,6 +163,4 @@ public class Networking {
         Calendar calendar = Calendar.getInstance();
         return dateFormat.format(calendar.getTime());
     }
-
-
 }

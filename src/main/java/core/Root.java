@@ -197,29 +197,30 @@ public class Root extends Application implements NetowrkingResponseListener{
         }
     }
 
-    public void handlePinButtonClick(Pin pin, String address) {
+    public void handlePinButtonClick(Pin pin) {
         String selectedCommandMode = menuViewController.getCommandMode();
         String pinType = pin.getPinType();
 
-        if (!Pin.PIN_TYPE_GPIO.equals(pin.getPinType())) {
+        if (!Pin.GPIO.equals(pin.getPinType())) {
             if (MenuViewController.OBSERVABLE_MACRO_TEXT.equals(selectedCommandMode)) {
                 alerts.createInfoAlert(null, CANNOT_SEND_MACRO);
                 logger.log(CANNOT_SEND_MACRO);
                 return;
             }
 
-            if (MenuViewController.OBSERVABLE_I2C_TEXT.equals(selectedCommandMode) && !Pin.PIN_TYPE_I2C.equals(pinType)) {
+            if (MenuViewController.OBSERVABLE_I2C_TEXT.equals(selectedCommandMode) && !Pin.I2C.equals(pinType)) {
                 alerts.createInfoAlert(null, CANNOT_SEND_I2C);
                 logger.log(CANNOT_SEND_I2C);
                 return;
             }
 
-            if (MenuViewController.OBSERVABLE_SPI_TEXT.equals(selectedCommandMode) && !Pin.PIN_TYPE_SPI.equals(pinType)) {
+            if (MenuViewController.OBSERVABLE_SPI_TEXT.equals(selectedCommandMode) && !Pin.SPI.equals(pinType)) {
                 alerts.createInfoAlert(null, CANNOT_SEND_SPI);
                 logger.log(CANNOT_SEND_SPI);
                 return;
             }
 
+            String address = menuViewController.getAddress();
             String command = menuViewController.getCommand();
 
             switch (selectedCommandMode) {

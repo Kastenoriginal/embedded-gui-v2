@@ -16,7 +16,7 @@
     <StackPane prefWidth="15"/>
     <VBox>
         <Label text="Embedded system IP"/>
-        <TextField fx:id="ipAddressTextField" prefWidth="240" onKeyReleased="#changeIp"/>
+        <TextField fx:id="ipAddressTextField" prefWidth="240" onKeyReleased="#changeIp" promptText="IP address"/>
         <StackPane prefHeight="10"/>
         <ComboBox fx:id="embeddedTypeComboBox" prefWidth="240" promptText="Select embedded type" onHidden="#setButtonsEnabled">
             <items>
@@ -34,8 +34,7 @@
         </HBox>
         <StackPane prefHeight="40"/>
         <Label text="Available systems"/>
-        <ComboBox fx:id="embeddedListComboBox" prefWidth="240" promptText="Select system to load"
-                  onMouseClicked="#chooseAvailableSystem" onHidden="#setSelectedSystemAvailable"/>
+        <ComboBox fx:id="embeddedListComboBox" prefWidth="240" promptText="Select system to load" onMouseClicked="#loadAvailableSystems" onHidden="#selectAvailableSystem"/>
         <Button text="Delete all configurations" onAction="#deleteAll"/>
         <StackPane prefHeight="50"/>
         <CheckBox fx:id="embeddedLayoutCheckBox" text="Show embedded layout" disable="true" onAction="#toggleLayoutVisible"/>
@@ -43,8 +42,8 @@
         <StackPane prefHeight="50"/>
         <Label text="Pin status refresh (ms)"/>
         <HBox>
-            <TextField fx:id="pinRequestTextField" text="1000" prefWidth="165" disable="true" onKeyReleased="#validatePinRequest"/>
-            <Button fx:id="pinRequestButton" text="Update" disable="true" onAction="#changeStatusRefreshRate"/>
+            <TextField fx:id="refreshRateTextField" text="1000" prefWidth="165" disable="true" onKeyReleased="#validateAndChangeRefreshRate"/>
+            <Button fx:id="updateRefreshRateButton" text="Update" disable="true" onAction="#changeRefreshRate"/>
         </HBox>
         <StackPane prefHeight="50"/>
         <HBox>
@@ -57,7 +56,9 @@
         </HBox>
         <ComboBox fx:id="textAreaComboBox" prefWidth="240" onHidden="#validateTextArea"/>
         <StackPane prefHeight="5"/>
-        <TextArea fx:id="textArea" prefRowCount="14" prefWidth="240" onKeyReleased="#validateTextArea"/>
+        <TextField fx:id="addressTextField" promptText="Physical address (without 0x)" prefWidth="240" onKeyReleased="#validatePhysicalAddress"/>
+        <StackPane prefHeight="1"/>
+        <TextArea fx:id="messagesTextArea" prefRowCount="12" prefWidth="240" onKeyReleased="#validateTextArea"/>
         <Button fx:id="sendButton" text="Send" onAction="#sendTextAreaMessage" disable="true"/>
     </VBox>
     <StackPane prefWidth="15"/>

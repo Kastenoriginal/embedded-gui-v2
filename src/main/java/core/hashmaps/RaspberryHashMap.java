@@ -6,62 +6,53 @@ import java.util.HashMap;
 
 public class RaspberryHashMap {
 
-    public final static String GND = "GND";
-    public final static String PWR3 = "PWR3";
-    public final static String PWR5 = "PWR5";
-    public final static String GPIO = "GPIO";
-//    public final static String I2C = "I2C";
-//    public final static String SPI = "SPI";
-    public final static String UART = "UART";
-    public final static String EEPROM = "EEPROM";
-
     private HashMap<Integer, String[]> hashMap = new HashMap<>();
 
     public void createHashMap() {
-        String[] pin1 = { PWR3 };
-        String[] pin2 = { PWR5 };
-        String[] pin3 = { GPIO, Pin.PIN_TYPE_I2C };
-        String[] pin4 = { PWR5 };
-        String[] pin5 = { GPIO, Pin.PIN_TYPE_I2C };
-        String[] pin6 = { GND };
-        String[] pin7 = { GPIO };
-        String[] pin8 = { GPIO, UART };
-        String[] pin9 = { GND };
+        String[] pin1 = { Pin.PWR3};
+        String[] pin2 = { Pin.PWR5};
+        String[] pin3 = { Pin.GPIO, Pin.I2C};
+        String[] pin4 = { Pin.PWR5};
+        String[] pin5 = { Pin.GPIO, Pin.I2C};
+        String[] pin6 = { Pin.GND};
+        String[] pin7 = { Pin.GPIO};
+        String[] pin8 = { Pin.GPIO, Pin.UART};
+        String[] pin9 = { Pin.GND};
 
-        String[] pin10 = { GPIO, UART };
-        String[] pin11 = { GPIO };
-        String[] pin12 = { GPIO };
-        String[] pin13 = { GPIO };
-        String[] pin14 = { GND };
-        String[] pin15 = { GPIO };
-        String[] pin16 = { GPIO };
-        String[] pin17 = { PWR3 };
-        String[] pin18 = { GPIO };
-        String[] pin19 = { GPIO, Pin.PIN_TYPE_SPI };
+        String[] pin10 = { Pin.GPIO, Pin.UART};
+        String[] pin11 = { Pin.GPIO};
+        String[] pin12 = { Pin.GPIO};
+        String[] pin13 = { Pin.GPIO};
+        String[] pin14 = { Pin.GND};
+        String[] pin15 = { Pin.GPIO};
+        String[] pin16 = { Pin.GPIO};
+        String[] pin17 = { Pin.PWR3};
+        String[] pin18 = { Pin.GPIO};
+        String[] pin19 = { Pin.GPIO, Pin.SPI};
 
-        String[] pin20 = { GND };
-        String[] pin21 = { GPIO, Pin.PIN_TYPE_SPI };
-        String[] pin22 = { GPIO };
-        String[] pin23 = { GPIO, Pin.PIN_TYPE_SPI };
-        String[] pin24 = { GPIO, Pin.PIN_TYPE_SPI };
-        String[] pin25 = { GND };
-        String[] pin26 = { GPIO, Pin.PIN_TYPE_SPI };
-        String[] pin27 = { EEPROM };
-        String[] pin28 = { EEPROM };
-        String[] pin29 = { GPIO };
+        String[] pin20 = { Pin.GND};
+        String[] pin21 = { Pin.GPIO, Pin.SPI};
+        String[] pin22 = { Pin.GPIO};
+        String[] pin23 = { Pin.GPIO, Pin.SPI};
+        String[] pin24 = { Pin.GPIO, Pin.SPI};
+        String[] pin25 = { Pin.GND};
+        String[] pin26 = { Pin.GPIO, Pin.SPI};
+        String[] pin27 = { Pin.EEPROM};
+        String[] pin28 = { Pin.EEPROM};
+        String[] pin29 = { Pin.GPIO};
 
-        String[] pin30 = { GND };
-        String[] pin31 = { GPIO };
-        String[] pin32 = { GPIO };
-        String[] pin33 = { GPIO };
-        String[] pin34 = { GND };
-        String[] pin35 = { GPIO };
-        String[] pin36 = { GPIO };
-        String[] pin37 = { GPIO };
-        String[] pin38 = { GPIO };
-        String[] pin39 = { GND };
+        String[] pin30 = { Pin.GND};
+        String[] pin31 = { Pin.GPIO};
+        String[] pin32 = { Pin.GPIO};
+        String[] pin33 = { Pin.GPIO};
+        String[] pin34 = { Pin.GND};
+        String[] pin35 = { Pin.GPIO};
+        String[] pin36 = { Pin.GPIO};
+        String[] pin37 = { Pin.GPIO};
+        String[] pin38 = { Pin.GPIO};
+        String[] pin39 = { Pin.GND};
 
-        String[] pin40 = { GPIO };
+        String[] pin40 = { Pin.GPIO};
 
         hashMap.put(1, pin1);
         hashMap.put(2, pin2);

@@ -13,5 +13,4 @@ public class Logger {
     public void log(String message){
         logView.appendText(message + "\n");
     }
-
 }

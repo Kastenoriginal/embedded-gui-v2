@@ -36,5 +36,4 @@ public class AlertsImpl implements Alerts {
         alert.setContentText(content);
         return alert;
     }
-
 }

@@ -19,10 +19,8 @@ public class HelpDialog {
     private static final URL DIALOG_VIEW = Root.class.getResource("/dialogView.fxml");
 
     private Stage stage;
-    private Logger logger;
 
     public HelpDialog(ActionEvent event, Logger logger) {
-        this.logger = logger;
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(DIALOG_VIEW);
