@@ -28,20 +28,23 @@ class SendValueToI2CPin implements Callable<NetworkingParams> {
 
     @Override
     public NetworkingParams call() throws Exception {
-        if (pin.getPinId() < TWO_DIGITS_VALUE) {
-            String i2cMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + ADDRESS_PREFIX + address + message;
-            logger.log("Sending: " + i2cMessage);
-            params.out.println(message);
-        } else {
-            String i2cMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + ADDRESS_PREFIX + address + message;
-            logger.log("Sending: " + i2cMessage);
-            params.out.println(message);
-        }
+        if (params != null) {
+            if (pin.getPinId() < TWO_DIGITS_VALUE) {
+                String i2cMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + ADDRESS_PREFIX + address + message;
+                logger.log("Sending: " + i2cMessage);
+                params.out.println(message);
+            } else {
+                String i2cMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + ADDRESS_PREFIX + address + message;
+                logger.log("Sending: " + i2cMessage);
+                params.out.println(message);
+            }
 
-        // TODO: 16.8.2016 uncomment when i2c response will be implemented on server side (and test it then)
+            // TODO: 16.8.2016 uncomment when i2c response will be implemented on server side (and test it then)
 //        String response = params.in.readLine();
 //        logger.log(response);
-
+        } else {
+            logger.log("Not connected. Cannot send I2C message.");
+    }
         return params;
     }
 }

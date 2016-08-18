@@ -34,8 +34,11 @@ class ToggleGpioPin implements Callable<NetworkingParams> {
                 params.out.println(message);
             }
 
+            // TODO: 18.8.2016 test response
             String response = params.in.readLine();
             logger.log(response);
+        } else {
+            logger.log("Not connected. Cannot toggle GPIO pin.");
         }
         return params;
     }

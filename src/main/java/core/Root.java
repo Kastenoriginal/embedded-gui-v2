@@ -224,7 +224,7 @@ public class Root extends Application implements NetowrkingResponseListener{
 
             switch (selectedCommandMode) {
                 case MenuViewController.OBSERVABLE_I2C_TEXT:
-                    if (validations.isI2CStringValid(command) && validations.isPhysicalAddressValid(address)) {
+                    if (validations.isHexaStringValid(command) && validations.isPhysicalAddressValid(address)) {
                         logger.log("I2C message akoze sent na pin: " + pin + " with address: " + address + " and command: " + command);
                         // TODO: 18.8.2016 NETWORK_OP
 //                    networking.sendValueToI2CPin(pin, address, command);
@@ -232,7 +232,7 @@ public class Root extends Application implements NetowrkingResponseListener{
                     return;
                 // TODO: 17.8.2016 ak chcem odpoved od networkingu treba dat parameter to metody this a v metode to bude callback
                 case MenuViewController.OBSERVABLE_SPI_TEXT:
-                    if (validations.isSPIStringValid(command) && validations.isPhysicalAddressValid(address)) {
+                    if (validations.isHexaStringValid(command) && validations.isPhysicalAddressValid(address)) {
                         logger.log("SPI message akoze sent na pin: " + pin + " with address: " + address + " and command: " + command);
                         // TODO: 18.8.2016 NETWORK_OP
 //                    networking.sendValueToSpiPin(pin, address, command);

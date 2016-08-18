@@ -81,7 +81,6 @@ public class Networking {
         this.refreshRate = refreshRate;
         this.pins = pins;
         // TODO: 15.8.2016 ScheduledFuture bude asi topka ale treba testovat so serverom
-        // TODO: 15.8.2016 piny ako objekt podsunut
         scheduledService = Executors.newSingleThreadScheduledExecutor();
         final StartRequestPinStatus status = new StartRequestPinStatus(logger, getDateAndTime(), pins);
         scheduledService.scheduleAtFixedRate(new Runnable() {
@@ -117,27 +116,48 @@ public class Networking {
     }
 
     public synchronized void sendMacro(List<String> commands) {
+        // TODO: 18.8.2016 send macro implementuje callable + pridat tam to co je v metode executecommand
         for (String command : commands) {
-            // TODO: 16.8.2016 implement every command line (they are already without semicolon
-            executeCommand(command);
+            command = command.substring(0, command.lastIndexOf(";"));
+            logger.log("Sending: " + command);
+            sendMacroCommand(command);
+        }
+        logger.log("Macro sent.");
+    }
+
+    private void sendMacroCommand(String command) {
+        if (validations.isOnlyDigitString(command)) {
+            sleepThread(connectionService, Integer.valueOf(command));
+        } else {
+            int pinId;
+            String hexaCommand;
+            // TODO: 18.8.2016 remove
+            String address = "TEMP_ADDRESS";
+
+            if (command.startsWith("GPIO")) {
+                pinId = Integer.valueOf(command.substring(5, 7));
+                Pin pin = new Pin(pinId, "O", "GPIO");
+                ToggleGpioPin(pin);
+            } else if (command.startsWith("I2C")) {
+                pinId = Integer.valueOf(command.substring(4, 6));
+                hexaCommand = command.substring(6);
+                Pin pin = new Pin(pinId, "O", "I2C");
+                // TODO: 18.8.2016 get address
+                sendValueToI2CPin(pin, address, hexaCommand);
+            } else if (command.startsWith("SPI")) {
+                pinId = Integer.valueOf(command.substring(4, 6));
+                hexaCommand = command.substring(6);
+                Pin pin = new Pin(pinId, "O", "SPI");
+                sendValueToSpiPin(pin, address, hexaCommand);
+            } else {
+                logger.log("Not supported command in macro.");
+            }
         }
     }
 
-    private void executeCommand(String command) {
-        // TODO: 16.8.2016 upravit pseudokod - toto asi bude nova class asi aj novy thread atd
-//        if (number) {
-//            delay(command);
-//        } else {
-//            if (command.startsWith("GPIO")) {
-//                ToggleGpioPin();
-//            } else if (command.startsWith("I2C")) {
-//                sendI2CMessage();
-//            } else if (command.startsWith("SPI")) {
-//                sendSPIMessage();
-//            } else {
-//                logger.log("Not supported command in macro.");
-//            }
-//        }
+    private void sleepThread(ExecutorService service, int sleepTimeMillis) {
+        logger.log("Sleeping thread for " + sleepTimeMillis + " seconds.");
+        service.submit(new SleepThread(sleepTimeMillis));
     }
 
     private String getDateAndTime() {
@@ -145,4 +165,6 @@ public class Networking {
         Calendar calendar = Calendar.getInstance();
         return dateFormat.format(calendar.getTime());
     }
+
+
 }

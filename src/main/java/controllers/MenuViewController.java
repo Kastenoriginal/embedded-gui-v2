@@ -342,9 +342,10 @@ public class MenuViewController {
         String textAreaText = textArea.getText();
         switch (textAreaComboBox.getSelectionModel().getSelectedItem()) {
             case OBSERVABLE_MACRO_TEXT:
-                // TODO: 13.8.2016 extract text to commands array list
-                List<String> commands = Arrays.asList(textAreaText.split(";"));
+                List<String> commands = Arrays.asList(textAreaText.split("\n"));
+                // TODO: 18.8.2016  vyvolaj popup
                 networking.sendMacro(commands);
+                // TODO: 18.8.2016 zavri popup
                 break;
             case OBSERVABLE_I2C_TEXT:
                 logger.log(SEND_I2C_BY_BUTTON);

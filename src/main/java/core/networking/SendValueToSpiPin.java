@@ -27,20 +27,23 @@ class SendValueToSpiPin implements Callable<NetworkingParams> {
 
     @Override
     public NetworkingParams call() throws Exception {
-        if (pin.getPinId() < TWO_DIGITS_VALUE) {
-            String spiMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + address + message;
-            logger.log("Sending: " + spiMessage);
-            params.out.println(message);
-        } else {
-            String spiMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + address + message;
-            logger.log("Sending: " + spiMessage);
-            params.out.println(message);
-        }
+        if (params != null) {
+            if (pin.getPinId() < TWO_DIGITS_VALUE) {
+                String spiMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + address + message;
+                logger.log("Sending: " + spiMessage);
+                params.out.println(message);
+            } else {
+                String spiMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + address + message;
+                logger.log("Sending: " + spiMessage);
+                params.out.println(message);
+            }
 
-        // TODO: 16.8.2016 uncomment when spi response will be implemented on server side (and test it then)
+            // TODO: 16.8.2016 uncomment when spi response will be implemented on server side (and test it then)
 //        String response = params.in.readLine();
 //        logger.log(response);
-
+        } else {
+            logger.log("Not connected. Cannot send SPI message.");
+        }
         return params;
     }
 }

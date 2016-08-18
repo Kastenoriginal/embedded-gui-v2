@@ -93,10 +93,10 @@ public class Validations {
                 }
                 String command = token[0];
                 String content = token[1];
-                if (!content.isEmpty() && I2C_STRING.equals(command) && isI2CStringValid(content)) {
+                if (!content.isEmpty() && I2C_STRING.equals(command) && isMacroHexaCommandValid(content)) {
                     validLine = true;
                 }
-                if (!content.isEmpty() && SPI_STRING.equals(command) && isSPIStringValid(content)) {
+                if (!content.isEmpty() && SPI_STRING.equals(command) && isMacroHexaCommandValid(content)) {
                     validLine = true;
                 }
                 if (GPIO_STRING.equals(command) && content.length() == GPIO_CONTENT_LENGTH && isOnlyDigitString(content)) {
@@ -116,7 +116,7 @@ public class Validations {
         return true;
     }
 
-    private boolean isOnlyDigitString(String input) {
+    public boolean isOnlyDigitString(String input) {
         return input.matches(DIGIT_ONLY_REGEX);
     }
 
@@ -130,11 +130,11 @@ public class Validations {
         return (i2CMatcher.matches() && !input.equals(""));
     }
 
-    public boolean isI2CStringValid(String input) {
-        return isDoubleHexaString(input);
+    public boolean isMacroHexaCommandValid(String input) {
+        return isOnlyDigitString(input.substring(0, 2)) && isHexaStringValid(input.substring(2));
     }
 
-    boolean isSPIStringValid(String input) {
+    public boolean isHexaStringValid(String input) {
         return isDoubleHexaString(input);
     }
 
@@ -155,9 +155,9 @@ public class Validations {
             case 0:
                 return isMacroAreaValid(input);
             case 1:
-                return isI2CStringValid(input);
+                return isHexaStringValid(input);
             case 2:
-                return isSPIStringValid(input);
+                return isHexaStringValid(input);
             default:
                 return false;
         }
