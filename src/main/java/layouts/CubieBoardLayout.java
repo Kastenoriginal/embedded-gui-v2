@@ -32,6 +32,12 @@ public class CubieBoardLayout implements EmbeddedLayout{
 
     @Override
     public List<Pin> getCheckedPins() {
+        // TODO: 19.8.2016 get pins
         return null;
+    }
+
+    @Override
+    public void updatePinsStatus(List<Pin> pins) {
+        // TODO: 19.8.2016 implement
     }
 }

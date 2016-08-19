@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import layouts.EmbeddedLayout;
 import models.MenuViewModel;
 
 import java.io.IOException;
@@ -248,7 +249,8 @@ public class MenuViewController {
             updateRefreshRateButton.setDisable(false);
             validateAndChangeRefreshRate();
             List<Pin> pins = root.getCheckedPins();
-            networking.startRequestPinStatus(refreshRate, pins);
+            EmbeddedLayout callback = root.getRequestStatusCallback();
+            networking.startRequestPinStatus(callback, refreshRate, pins);
             // TODO: 16.8.2016 from eclipse method setUiFromResponse (include in new Thread task if networking method below does not do it)
         } else {
             refreshRateTextField.setDisable(true);
@@ -274,7 +276,8 @@ public class MenuViewController {
     @FXML
     private void changeRefreshRate() {
         String refreshRate = refreshRateTextField.getText();
-        networking.updateRequestRefreshRate(Integer.valueOf(refreshRate));
+        EmbeddedLayout callback = root.getRequestStatusCallback();
+        networking.updateRequestRefreshRate(callback, Integer.valueOf(refreshRate));
         logger.log("Refresh rate updated to " + refreshRate);
     }
 

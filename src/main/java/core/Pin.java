@@ -18,6 +18,7 @@ public class Pin {
     private int pinId;
     private String ioType;
     private String pinType;
+    private boolean value;
 
     public Pin(int pinId, String ioType, String pinType) {
         this.pinId = pinId;
@@ -35,5 +36,13 @@ public class Pin {
 
     public String getPinType() {
         return pinType;
+    }
+
+    public boolean isValue() {
+        return value;
+    }
+
+    public void setValue(boolean value) {
+        this.value = value;
     }
 }

@@ -40,11 +40,12 @@ class SendValueToI2CPin implements Callable<NetworkingParams> {
             }
 
             // TODO: 16.8.2016 uncomment when i2c response will be implemented on server side (and test it then)
-//        String response = params.in.readLine();
-//        logger.log(response);
+//            String response = params.in.readLine();
+//            params.message = response;
+//            logger.log(response);
         } else {
             logger.log("Not connected. Cannot send I2C message.");
-    }
+        }
         return params;
     }
 }

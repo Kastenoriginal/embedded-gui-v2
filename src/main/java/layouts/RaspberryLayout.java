@@ -1,6 +1,9 @@
 package layouts;
 
-import core.*;
+import core.AlertsImpl;
+import core.Logger;
+import core.Pin;
+import core.Root;
 import core.hashmaps.RaspberryHashMap;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -8,7 +11,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
@@ -318,5 +323,25 @@ public class RaspberryLayout implements EmbeddedLayout {
     @Override
     public List<Pin> getCheckedPins() {
         return pins;
+    }
+
+    @Override
+    public void updatePinsStatus(List<Pin> pins) {
+
+        String colorRed = "-fx-background-color: #ff9999;-fx-text-fill: black;";
+        String colorGreen = "-fx-background-color: #99ff99;-fx-text-fill: black;";
+
+        String randomColor = Math.random() > 0.5 ? colorRed : colorGreen;
+
+        // TODO: 19.8.2016 kuknut eclipse metodu setUiFromResponse a podla toho co pride zo servera poriesit metodu ify atd...
+        for (Pin pin : pins) {
+            int pinId = pin.getPinId() - 1;
+            if (pin.isValue()) {
+                buttons.get(pinId).setStyle(randomColor);
+            } else {
+                buttons.get(pinId).setStyle(randomColor);
+            }
+
+        }
     }
 }

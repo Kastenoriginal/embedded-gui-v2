@@ -3,6 +3,7 @@ package core.networking;
 import core.Logger;
 import core.Pin;
 import core.Validations;
+import layouts.EmbeddedLayout;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,7 +13,7 @@ import java.util.concurrent.*;
 
 public class Networking {
 
-    private final static String DATE_FORMAT = "ddMMyyyyHHmmss";
+    final static String DATE_FORMAT = "ddMMyyyyHHmmss";
     private final static int INITIAL_DELAY = 5;
 
     private ExecutorService connectionService;
@@ -49,7 +50,7 @@ public class Networking {
         }
     }
 
-    public synchronized void ToggleGpioPin(Pin pin) {
+    public synchronized void toggleGpioPin(Pin pin) {
         try {
             connectionService.submit(new ToggleGpioPin(getDateAndTime(), params, logger, pin)).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -77,12 +78,12 @@ public class Networking {
         }
     }
 
-    public synchronized void startRequestPinStatus(int refreshRate, final List<Pin> pins) {
+    public synchronized void startRequestPinStatus(EmbeddedLayout callback, int refreshRate, final List<Pin> pins) {
         this.refreshRate = refreshRate;
         this.pins = pins;
         // TODO: 15.8.2016 ScheduledFuture bude asi topka ale treba testovat so serverom
         scheduledService = Executors.newSingleThreadScheduledExecutor();
-        final StartRequestPinStatus status = new StartRequestPinStatus(logger, getDateAndTime(), pins);
+        final StartRequestPinStatus status = new StartRequestPinStatus(callback, logger, getDateAndTime(), pins);
         scheduledService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -101,61 +102,24 @@ public class Networking {
         }
     }
 
-    public synchronized void updateRequestRefreshRate(int refreshRate) {
+    public synchronized void updateRequestRefreshRate(EmbeddedLayout callback, int refreshRate) {
         this.refreshRate = refreshRate;
         cancelRequestPinStatus();
         scheduledService = Executors.newSingleThreadScheduledExecutor();
-        startRequestPinStatus(refreshRate, this.pins);
+        startRequestPinStatus(callback, refreshRate, this.pins);
     }
 
-    public synchronized void updatePinsInRequestStatus(List<Pin> pins) {
+    public synchronized void updatePinsInRequestStatus(EmbeddedLayout callback, List<Pin> pins) {
         this.pins = pins;
         cancelRequestPinStatus();
         scheduledService = Executors.newSingleThreadScheduledExecutor();
-        startRequestPinStatus(this.refreshRate, pins);
+        startRequestPinStatus(callback, this.refreshRate, pins);
     }
 
     public synchronized void sendMacro(String address, List<String> commands) {
         // TODO: 18.8.2016 send macro implementuje callable na response
         // TODO: 19.8.2016 to je stary flow novy je ze sa explicitne volaju metody ktore asi budu implementovat callable
-        for (String command : commands) {
-            command = command.substring(0, command.lastIndexOf(";"));
-            logger.log("Sending: " + command);
-            sendMacroCommand(address, command);
-        }
-        logger.log("Macro sent.");
-    }
-
-    private void sendMacroCommand(String address, String command) {
-        if (validations.isOnlyDigitString(command)) {
-            sleepThread(connectionService, Integer.valueOf(command));
-        } else {
-            int pinId;
-            String hexaCommand;
-
-            if (command.startsWith("GPIO")) {
-                pinId = Integer.valueOf(command.substring(5, 7));
-                Pin pin = new Pin(pinId, "O", "GPIO");
-                ToggleGpioPin(pin);
-            } else if (command.startsWith("I2C")) {
-                pinId = Integer.valueOf(command.substring(4, 6));
-                hexaCommand = command.substring(6);
-                Pin pin = new Pin(pinId, "O", "I2C");
-                sendValueToI2CPin(pin, address, hexaCommand);
-            } else if (command.startsWith("SPI")) {
-                pinId = Integer.valueOf(command.substring(4, 6));
-                hexaCommand = command.substring(6);
-                Pin pin = new Pin(pinId, "O", "SPI");
-                sendValueToSpiPin(pin, address, hexaCommand);
-            } else {
-                logger.log("Not supported command in macro.");
-            }
-        }
-    }
-
-    private void sleepThread(ExecutorService service, int sleepTimeMillis) {
-        logger.log("Sleeping thread for " + sleepTimeMillis + " seconds.");
-        service.submit(new SleepThread(sleepTimeMillis));
+        connectionService.submit(new SendMacro(params, logger, address, commands));
     }
 
     private String getDateAndTime() {

@@ -1,7 +1,6 @@
 package core;
 
 import controllers.MenuViewController;
-import core.networking.NetowrkingResponseListener;
 import core.networking.Networking;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -27,7 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Root extends Application implements NetowrkingResponseListener{
+public class Root extends Application {
 
     static final String CSS_FILE = Root.class.getClassLoader().getResource("Style.css").toExternalForm();
     private final static String APPLICATION_TITLE = "Embedded GUI";
@@ -245,22 +244,15 @@ public class Root extends Application implements NetowrkingResponseListener{
             }
         } else {
             // TODO: 18.8.2016 NETWORK_OP
-//            networking.ToggleGpioPin(pin);
+//            networking.toggleGpioPin(pin);
             logger.log("Pin " + pin.getPinId() + " sent.");
         }
     }
 
     public void handleCheckBoxClick(ArrayList<Pin> pins) {
         if (menuViewController.isSendRequestCheckBoxChecked()) {
-            networking.updatePinsInRequestStatus(pins);
+            networking.updatePinsInRequestStatus(layout, pins);
         }
-    }
-
-    @Override
-    public void updateUi() {
-        // TODO: 17.8.2016 tato metoda nastane potom ako sa vrati callback
-        // TODO: 17.8.2016 alebo to co ma nastat podla responsu
-        //        layout.update();
     }
 
     public String getVisibleLayout() {
@@ -282,5 +274,9 @@ public class Root extends Application implements NetowrkingResponseListener{
 
     public boolean isLayoutDisplayed() {
         return layout instanceof EmbeddedLayout;
+    }
+
+    public EmbeddedLayout getRequestStatusCallback() {
+        return layout;
     }
 }

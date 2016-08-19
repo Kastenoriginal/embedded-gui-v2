@@ -339,4 +339,9 @@ public class BeagleBoneLayout implements EmbeddedLayout {
     public List<Pin> getCheckedPins() {
         return pins;
     }
+
+    @Override
+    public void updatePinsStatus(List<Pin> pins) {
+        // TODO: 19.8.2016 skopirovat z RPI layoutu ked to tam bude hotove
+    }
 }
