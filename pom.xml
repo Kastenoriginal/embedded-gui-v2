@@ -7,7 +7,11 @@
     <groupId>com.kastenoriginal</groupId>
     <artifactId>embedded-gui</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>embedded-agent</module>
+        <module>../embedded-agent</module>
+    </modules>
+    <packaging>pom</packaging>
     <name>Embedded GUI</name>
 
     <dependencies>

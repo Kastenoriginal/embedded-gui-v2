@@ -24,7 +24,7 @@ public class MenuViewController {
     private final static String NO_IMAGE = "";
     private final static String WRONG_IP_FORMAT = "Wrong IP address format";
     private final static String NO_EMBEDDED_CHOSEN = "Choose embedded type before saving.";
-    private final static String NO_FILE_AVAILABLE = "Cannot load file with system configuration. Create new file by adding system configuration.";
+    private final static String NO_FILE_AVAILABLE = "No embedded configuration is set. Add system configuration before being able to load any.";
     private final static String DEFAULT_SYSTEM_TYPE = "Cannot process system type. Select from available options.";
     private final static String DEFAULT_AVAILABLE_SYSTEM = "Selected layout is already visible or no layout was chosen.";
     private final static String SEND_I2C_BY_BUTTON = "Send I2C by clicking on appropriate button in layout.";
@@ -132,20 +132,20 @@ public class MenuViewController {
         if (event == null) {
             // TODO: 18.8.2016 NETWORK_OP
             // TODO: 19.8.2016 mozno popup 
-//            boolean connected = networking.connect(selectedSystemIpFromComboBox);
-//            if (connected) {
-            root.showEmbeddedLayout(selectedSystemTypeFromComboBox);
-            logger.log(selectedSystemTypeFromComboBox + " layout loaded.");
-//            }
+            boolean connected = networking.connect(selectedSystemIpFromComboBox);
+            if (connected) {
+                root.showEmbeddedLayout(selectedSystemTypeFromComboBox);
+                logger.log(selectedSystemTypeFromComboBox + " layout loaded.");
+            }
         } else {
             String ipAddress = ipAddressTextField.getText();
             if (validations.isIpAddress(ipAddress)) {
                 // TODO: 18.8.2016 NETWORK_OP
-//                boolean connected = networking.connect(ipAddress);
-//                if (connected) {
-                root.showEmbeddedLayout(selectedSystemTypeFromButton);
-                logger.log(selectedSystemTypeFromButton + " layout loaded.");
-//                }
+                boolean connected = networking.connect(ipAddress);
+                if (connected) {
+                    root.showEmbeddedLayout(selectedSystemTypeFromButton);
+                    logger.log(selectedSystemTypeFromButton + " layout loaded.");
+                }
             }
         }
     }
@@ -200,7 +200,7 @@ public class MenuViewController {
                 menuViewModel.readFileContent(false);
             }
         } catch (IOException e) {
-            alerts.createErrorAlert(null, NO_FILE_AVAILABLE);
+            alerts.createInfoAlert(null, NO_FILE_AVAILABLE);
             logger.log(NO_FILE_AVAILABLE);
         }
         ArrayList<String> embeddedList = menuViewModel.getEmbeddedSystems();
@@ -251,7 +251,6 @@ public class MenuViewController {
             List<Pin> pins = root.getCheckedPins();
             EmbeddedLayout callback = root.getRequestStatusCallback();
             networking.startRequestPinStatus(callback, refreshRate, pins);
-            // TODO: 16.8.2016 from eclipse method setUiFromResponse (include in new Thread task if networking method below does not do it)
         } else {
             refreshRateTextField.setDisable(true);
             updateRefreshRateButton.setDisable(true);
@@ -356,12 +355,7 @@ public class MenuViewController {
 
     @FXML
     private void sendTextAreaMessage() {
-        String address = addressTextField.getText();
         String textAreaText = messagesTextArea.getText();
-        boolean validateAddress = false;
-        if (textAreaText.contains("I2C") || textAreaText.contains("SPI")) {
-            validateAddress = true;
-        }
         switch (textAreaComboBox.getSelectionModel().getSelectedItem()) {
             case OBSERVABLE_MACRO_TEXT:
                 List<String> commands = Arrays.asList(textAreaText.split("\n"));
@@ -369,14 +363,8 @@ public class MenuViewController {
                     logger.log("Commands are not valid");
                     return;
                 }
-                if (validateAddress) {
-                    if (!validations.isPhysicalAddressValid(address)) {
-                        logger.log("Address is not valid");
-                        return;
-                    }
-                }
                 // TODO: 18.8.2016  vyvolaj popup
-                networking.sendMacro(address, commands);
+                networking.sendMacro(commands);
                 // TODO: 18.8.2016 zavri popup
                 break;
             case OBSERVABLE_I2C_TEXT:

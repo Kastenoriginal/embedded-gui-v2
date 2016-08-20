@@ -77,21 +77,27 @@ public class Validations {
     }
 
     private boolean isMacroAreaValid(String input) {
+        // input: Whole String from text area including newlines ("\n").
         if (input == null || input.isEmpty()) {
             return false;
         }
         for (String line : input.split("\\n")) {
             boolean validLine = false;
+            // line - one text area line that should end with MACRO_LINE_END
             if (line == null || line.isEmpty() || !line.endsWith(MACRO_LINE_END)) {
                 return false;
             }
+            // lineWithoutSemicolon - line without MACRO_LINE_END
             String lineWithoutSemicolon = line.substring(0, line.lastIndexOf(MACRO_LINE_END));
             if (line.startsWith(GPIO_STRING + COMMAND_SPLITTER) || line.startsWith(SPI_STRING + COMMAND_SPLITTER) || line.startsWith(I2C_STRING + COMMAND_SPLITTER)) {
+                // splitting line by COMMAND_SPLITTER
                 String[] token = lineWithoutSemicolon.split(COMMAND_SPLITTER);
                 if (token.length <= 1 || token[1].isEmpty()) {
                     return false;
                 }
+                //command - everything before COMMAND_SPLITTER (e.g I2C)
                 String command = token[0];
+                // content - everything after COMMAND_SPLITTER
                 String content = token[1];
                 if (!content.isEmpty() && I2C_STRING.equals(command) && isMacroHexaCommandValid(content)) {
                     validLine = true;
@@ -131,7 +137,7 @@ public class Validations {
     }
 
     public boolean isMacroHexaCommandValid(String input) {
-        return isOnlyDigitString(input.substring(0, 2)) && isHexaStringValid(input.substring(2));
+        return isPhysicalAddressValid(input.substring(0, 2)) && isOnlyDigitString(input.substring(2, 4)) && isHexaStringValid(input.substring(4));
     }
 
     public boolean isHexaStringValid(String input) {

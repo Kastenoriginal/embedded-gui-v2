@@ -59,8 +59,6 @@ public class Networking {
     }
 
     public synchronized void sendValueToI2CPin(Pin pin, String address, String message) {
-        address = "0x" + address;
-
         try {
             connectionService.submit(new SendValueToI2CPin(getDateAndTime(), params, logger, pin, address, message)).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -69,8 +67,6 @@ public class Networking {
     }
 
     public synchronized void sendValueToSpiPin(Pin pin, String address, String message) {
-        address = "0x" + address;
-
         try {
             connectionService.submit(new SendValueToSpiPin(getDateAndTime(), params, logger, pin, address, message)).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -83,7 +79,7 @@ public class Networking {
         this.pins = pins;
         // TODO: 15.8.2016 ScheduledFuture bude asi topka ale treba testovat so serverom
         scheduledService = Executors.newSingleThreadScheduledExecutor();
-        final StartRequestPinStatus status = new StartRequestPinStatus(callback, logger, getDateAndTime(), pins);
+        final StartRequestPinStatus status = new StartRequestPinStatus(callback, params, logger, getDateAndTime(), pins);
         scheduledService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -116,10 +112,8 @@ public class Networking {
         startRequestPinStatus(callback, this.refreshRate, pins);
     }
 
-    public synchronized void sendMacro(String address, List<String> commands) {
-        // TODO: 18.8.2016 send macro implementuje callable na response
-        // TODO: 19.8.2016 to je stary flow novy je ze sa explicitne volaju metody ktore asi budu implementovat callable
-        connectionService.submit(new SendMacro(params, logger, address, commands));
+    public synchronized void sendMacro(List<String> commands) {
+        connectionService.submit(new SendMacro(params, logger, commands));
     }
 
     private String getDateAndTime() {

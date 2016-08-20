@@ -34,6 +34,8 @@ public class RaspberryLayout implements EmbeddedLayout {
     private final static String GPIO_INPUT = "IN";
     private static final String BUTTON_FONT_SIZE = "-fx-font-size: 12";
     private static final String LAYOUT_CREATION_FAILED = "Creation of layout failed.";
+    private static final String BUTTON_COLOR_RED = "-fx-background-color: #ff9999;-fx-text-fill: black;";
+    private static final String BUTTON_COLOR_GREEN = "-fx-background-color: #99ff99;-fx-text-fill: black;";
 
     private Root root;
     private Logger logger;
@@ -328,10 +330,7 @@ public class RaspberryLayout implements EmbeddedLayout {
     @Override
     public void updatePinsStatus(List<Pin> pins) {
 
-        String colorRed = "-fx-background-color: #ff9999;-fx-text-fill: black;";
-        String colorGreen = "-fx-background-color: #99ff99;-fx-text-fill: black;";
-
-        String randomColor = Math.random() > 0.5 ? colorRed : colorGreen;
+        String randomColor = Math.random() > 0.5 ? BUTTON_COLOR_RED : BUTTON_COLOR_GREEN;
 
         // TODO: 19.8.2016 kuknut eclipse metodu setUiFromResponse a podla toho co pride zo servera poriesit metodu ify atd...
         for (Pin pin : pins) {

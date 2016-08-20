@@ -4,9 +4,7 @@ import core.Logger;
 import core.Pin;
 import layouts.EmbeddedLayout;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 class StartRequestPinStatus implements Callable<NetworkingParams> {
@@ -19,9 +17,9 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
     private List<Pin> pinList;
     private EmbeddedLayout callback;
 
-    StartRequestPinStatus(EmbeddedLayout callback, Logger logger, String dateAndTime, List<Pin> pinList) {
+    StartRequestPinStatus(EmbeddedLayout callback, NetworkingParams params, Logger logger, String dateAndTime, List<Pin> pinList) {
         this.callback = callback;
-        this.params = new NetworkingParams();
+        this.params = params;
         this.logger = logger;
         this.dateAndTime = dateAndTime;
         this.pinList = pinList;
@@ -41,10 +39,12 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
         }
         logger.log("Scheduling at fixed rate with pins: " + pinsToRequest);
         // TODO: 16.8.2016 Uncomment to test with server and response
-//        params.out.println(dateAndTime + PIN_REQUEST_CODE + pinsToRequest);
-//        params.message = params.in.readLine();
-        // TODO: 19.8.2016 zistit string message a rozparsovat
-        // TODO: 19.8.2016 foreach pin new List<Pin> kazdemu hodnotu a ID
+        params.out.println(dateAndTime + PIN_REQUEST_CODE + pinsToRequest);
+        params.message = params.in.readLine();
+        logger.log("GOT RESPONSE FROM SERVER: " + params.message);
+        // TODO: 19.8.2016 START;tocomazaujima;tocomazaujima2;END
+        // TODO: 19.8.2016 foreach pin new List<Pin> setnut kazdemu hodnotu a ID
+        // TODO: 20.8.2016 az potom mozem do callbacku vratit pinlist ked ich setnem - tieto pins pridu ako parameter rovno do layout metody na update
         callback.updatePinsStatus(pinList);
         return params;
     }

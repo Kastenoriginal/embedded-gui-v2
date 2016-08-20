@@ -225,17 +225,14 @@ public class Root extends Application {
             switch (selectedCommandMode) {
                 case MenuViewController.OBSERVABLE_I2C_TEXT:
                     if (validations.isHexaStringValid(command) && validations.isPhysicalAddressValid(address)) {
-                        logger.log("I2C message akoze sent na pin: " + pin + " with address: " + address + " and command: " + command);
-                        // TODO: 18.8.2016 NETWORK_OP
-//                    networking.sendValueToI2CPin(pin, address, command);
+                        networking.sendValueToI2CPin(pin, address, command);
+                    } else {
+                        logger.log(MESSAGE_SEND_FAILED + ": Invalid input.");
                     }
                     return;
-                // TODO: 17.8.2016 ak chcem odpoved od networkingu treba dat parameter to metody this a v metode to bude callback
                 case MenuViewController.OBSERVABLE_SPI_TEXT:
                     if (validations.isHexaStringValid(command) && validations.isPhysicalAddressValid(address)) {
-                        logger.log("SPI message akoze sent na pin: " + pin + " with address: " + address + " and command: " + command);
-                        // TODO: 18.8.2016 NETWORK_OP
-//                    networking.sendValueToSpiPin(pin, address, command);
+                        networking.sendValueToSpiPin(pin, address, command);
                     }
                     return;
                 default:
@@ -243,8 +240,7 @@ public class Root extends Application {
                     break;
             }
         } else {
-            // TODO: 18.8.2016 NETWORK_OP
-//            networking.toggleGpioPin(pin);
+            networking.toggleGpioPin(pin);
             logger.log("Pin " + pin.getPinId() + " sent.");
         }
     }
