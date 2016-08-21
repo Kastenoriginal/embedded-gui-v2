@@ -8,7 +8,6 @@
     <artifactId>embedded-gui</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>embedded-agent</module>
         <module>../embedded-agent</module>
     </modules>
     <packaging>pom</packaging>
