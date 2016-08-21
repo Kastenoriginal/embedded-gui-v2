@@ -40,7 +40,6 @@ class SendValueToSpiPin implements Callable<NetworkingParams> {
                 params.out.println(spiMessage);
             }
 
-            // TODO: 16.8.2016 uncomment when spi response will be implemented on server side (and test it then)
             String response = params.in.readLine();
             params.message = response;
             Platform.runLater(() -> logger.log(response));

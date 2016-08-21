@@ -15,8 +15,7 @@ class Connect implements Callable<NetworkingParams> {
 
     private final static String CONNECTION_COMMAND = "Connect";
     private final static String CONNECTION_SUCCESSFUL = "Connected successfully.";
-    // TODO: 28.7.2016 zmenit najprv na server side potom tu
-    private final static String CONNECTION_RESPONSE = "connected to server.";
+    private final static String CONNECTION_RESPONSE = "Server notified about client connect attempt.";
 
     private NetworkingParams params;
     private Logger logger;

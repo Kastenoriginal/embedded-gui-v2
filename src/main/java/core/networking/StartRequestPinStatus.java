@@ -40,7 +40,6 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
         }
         String finalPinsToRequest = pinsToRequest;
         Platform.runLater(() -> logger.log("Scheduling at fixed rate with pins: " + finalPinsToRequest));
-        // TODO: 16.8.2016 Uncomment to test with server and response
         params.out.println(dateAndTime + PIN_REQUEST_CODE + pinsToRequest);
         params.message = params.in.readLine();
         Platform.runLater(() -> logger.log("GOT RESPONSE FROM SERVER: " + params.message));

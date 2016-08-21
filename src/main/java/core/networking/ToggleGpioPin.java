@@ -34,8 +34,6 @@ class ToggleGpioPin implements Callable<NetworkingParams> {
                 Platform.runLater(() -> logger.log("Sending: " + message));
                 params.out.println(message);
             }
-            // TODO: 21.8.2016  GPIO pin skusit poslat z BBB layoutu na neexistujuci pin - breakpoint ci zamrzne na out alebo in
-            // TODO: 18.8.2016 test response
             String response = params.in.readLine();
             params.message = response;
             Platform.runLater(() -> logger.log(response));

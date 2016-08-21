@@ -105,7 +105,6 @@ public class Validations {
                 if (!content.isEmpty() && SPI_STRING.equals(command) && isMacroHexaCommandValid(content)) {
                     validLine = true;
                 }
-                // TODO: 21.8.2016 tu dat validaciu pin minimalne 01
                 boolean isLengthOk = content.length() == GPIO_CONTENT_LENGTH;
                 boolean pinNumberIsNotZero = !"00".equals(content.substring(0, 2));
                 if (GPIO_STRING.equals(command) && isLengthOk && pinNumberIsNotZero && isOnlyDigitString(content)) {
@@ -140,7 +139,6 @@ public class Validations {
     }
 
     public boolean isMacroHexaCommandValid(String input) {
-        // TODO: 21.8.2016 tu dat validaciu pin minimalne 01
         boolean pinNumberIsNotZero = !"00".equals(input.substring(2, 4));
         return isPhysicalAddressValid(input.substring(0, 2)) && isOnlyDigitString(input.substring(2, 4)) && pinNumberIsNotZero && isHexaStringValid(input.substring(4));
     }

@@ -40,17 +40,11 @@ class SendValueToI2CPin implements Callable<NetworkingParams> {
                 params.out.println(i2cMessage);
             }
 
-            // TODO: 16.8.2016 uncomment when i2c response will be implemented on server side (and test it then)
             String response = params.in.readLine();
             params.message = response;
             Platform.runLater(() -> logger.log(response));
         } else {
-            Platform.runLater(() -> logger.log("Pin ID: " + pin.getPinId()));
-            if (pin.getPinId() < TWO_DIGITS_VALUE) {
-                Platform.runLater(() -> logger.log("Not connected. Cannot send I2C message. " + dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + ADDRESS_PREFIX + address + message));
-            } else {
-                Platform.runLater(() -> logger.log("Not connected. Cannot send I2C message. " + dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + ADDRESS_PREFIX + address + message));
-            }
+            Platform.runLater(() -> logger.log("Not connected. Cannot send I2C message."));
         }
         return params;
     }
