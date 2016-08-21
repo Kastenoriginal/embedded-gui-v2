@@ -32,8 +32,8 @@ public class RaspberryLayout implements EmbeddedLayout {
     private final static String GPIO_INPUT = "IN";
     private static final String BUTTON_FONT_SIZE = "-fx-font-size: 12";
     private static final String LAYOUT_CREATION_FAILED = "Creation of layout failed.";
-    private static final String BUTTON_COLOR_RED = "-fx-background-color: #ff9999;-fx-text-fill: black;";
-    private static final String BUTTON_COLOR_GREEN = "-fx-background-color: #99ff99;-fx-text-fill: black;";
+    private static final String BUTTON_COLOR_RED = "-fx-background-color: #ff9999;-fx-text-fill: black;-fx-font-size: 9pt;";
+    private static final String BUTTON_COLOR_GREEN = "-fx-background-color: #99ff99;-fx-text-fill: black;-fx-font-size: 9pt;";
 
     private Root root;
     private Logger logger;

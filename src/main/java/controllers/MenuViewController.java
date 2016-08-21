@@ -368,7 +368,34 @@ public class MenuViewController {
                     return;
                 }
                 // TODO: 18.8.2016  vyvolaj popup
+
+
+
+
+//                Alert alert = new Alert(Alert.AlertType.NONE);
+//                alert.setContentText("Sending macro...");
+//                alert.show();
+
+
+                logger.log("Macro zacalo.");
+
                 networking.sendMacro(commands);
+
+                logger.log("Macro skoncilo.");
+
+
+
+
+
+
+//                ButtonType buttonType = new ButtonType("", ButtonBar.ButtonData.CANCEL_CLOSE);
+//                alert.getButtonTypes().setAll(buttonType);
+//                Button cancel = (Button) alert.getDialogPane().lookupButton(buttonType);
+//                cancel.fire();
+
+
+
+
                 // TODO: 18.8.2016 zavri popup
                 break;
             case OBSERVABLE_I2C_TEXT:
