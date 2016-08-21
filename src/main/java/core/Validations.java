@@ -31,7 +31,7 @@ public class Validations {
 
     private Logger logger;
 
-    public Validations(Logger logger){
+    public Validations(Logger logger) {
         this.logger = logger;
     }
 
@@ -105,7 +105,10 @@ public class Validations {
                 if (!content.isEmpty() && SPI_STRING.equals(command) && isMacroHexaCommandValid(content)) {
                     validLine = true;
                 }
-                if (GPIO_STRING.equals(command) && content.length() == GPIO_CONTENT_LENGTH && isOnlyDigitString(content)) {
+                // TODO: 21.8.2016 tu dat validaciu pin minimalne 01
+                boolean isLengthOk = content.length() == GPIO_CONTENT_LENGTH;
+                boolean pinNumberIsNotZero = !"00".equals(content.substring(0, 2));
+                if (GPIO_STRING.equals(command) && isLengthOk && pinNumberIsNotZero && isOnlyDigitString(content)) {
                     String valueToSend = String.valueOf(content.charAt(GPIO_VALUE_POSITION));
                     validLine = valueToSend.equals(GPIO_OFF_VALUE) || valueToSend.equals(GPIO_ON_VALUE);
                 }
@@ -137,7 +140,9 @@ public class Validations {
     }
 
     public boolean isMacroHexaCommandValid(String input) {
-        return isPhysicalAddressValid(input.substring(0, 2)) && isOnlyDigitString(input.substring(2, 4)) && isHexaStringValid(input.substring(4));
+        // TODO: 21.8.2016 tu dat validaciu pin minimalne 01
+        boolean pinNumberIsNotZero = !"00".equals(input.substring(2, 4));
+        return isPhysicalAddressValid(input.substring(0, 2)) && isOnlyDigitString(input.substring(2, 4)) && pinNumberIsNotZero && isHexaStringValid(input.substring(4));
     }
 
     public boolean isHexaStringValid(String input) {

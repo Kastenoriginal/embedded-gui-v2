@@ -2,6 +2,7 @@ package core.networking;
 
 import core.Logger;
 import core.Pin;
+import javafx.application.Platform;
 
 import java.util.concurrent.Callable;
 
@@ -26,20 +27,20 @@ class ToggleGpioPin implements Callable<NetworkingParams> {
         if (params != null) {
             if (pin.getPinId() < TWO_DIGITS_VALUE) {
                 String message = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + "1";
-                logger.log("Sending: " + message);
+                Platform.runLater(() -> logger.log("Sending: " + message));
                 params.out.println(message);
             } else {
                 String message = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + "1";
-               logger.log("Sending: " + message);
+                Platform.runLater(() -> logger.log("Sending: " + message));
                 params.out.println(message);
             }
-
+            // TODO: 21.8.2016  GPIO pin skusit poslat z BBB layoutu na neexistujuci pin - breakpoint ci zamrzne na out alebo in
             // TODO: 18.8.2016 test response
             String response = params.in.readLine();
             params.message = response;
-            logger.log(response);
+            Platform.runLater(() -> logger.log(response));
         } else {
-            logger.log("Not connected. Cannot toggle GPIO pin.");
+            Platform.runLater(() -> logger.log("Not connected. Cannot toggle GPIO pin."));
         }
         return params;
     }

@@ -203,7 +203,7 @@ public class BeagleBoneLayout implements EmbeddedLayout {
                 Button currentRowButton = buttons.get(pinTypeComboBoxId);
                 CheckBox currentRowCheckBox = checkBoxes.get(pinTypeComboBoxId);
                 setElementsVisibility(pinTypeComboBox.getSelectionModel().getSelectedItem(), currentRowComboBox, currentRowButton, currentRowCheckBox.isSelected());
-                synchronizeI2cElements(pinTypeComboBox);
+                synchronizePinElements(pinTypeComboBox);
             }
         };
         pinTypeComboBox.setOnAction(eventHandler);
@@ -246,27 +246,45 @@ public class BeagleBoneLayout implements EmbeddedLayout {
     }
 
     private void enableRowElements(int checkBoxId) {
+        ComboBox currentPinTypeComboBox = pinTypeComboBoxes.get(checkBoxId);
+        currentPinTypeComboBox.setDisable(false);
         inputOutputComboBoxes.get(checkBoxId).setDisable(false);
-        pinTypeComboBoxes.get(checkBoxId).setDisable(false);
         buttons.get(checkBoxId).setDisable(false);
-        for (ComboBox<String> comboBox : pinTypeComboBoxes) {
-            String currentComboBoxSelectedItem = comboBox.getSelectionModel().getSelectedItem();
-
-            if (currentComboBoxSelectedItem.equals(Pin.I2C)) {
-                int comboBoxId = Integer.valueOf(comboBox.getId()) - 1;
-                checkBoxes.get(comboBoxId).setSelected(true);
+        if (Pin.I2C.equals(currentPinTypeComboBox.getSelectionModel().getSelectedItem())) {
+            for (ComboBox<String> pinTypeComboBox : pinTypeComboBoxes) {
+                if (Pin.I2C.equals(pinTypeComboBox.getSelectionModel().getSelectedItem())) {
+                    int comboBoxId = Integer.valueOf(pinTypeComboBox.getId()) - 1;
+                    checkBoxes.get(comboBoxId).setSelected(true);
+                }
+            }
+        } else if (Pin.SPI.equals(currentPinTypeComboBox.getSelectionModel().getSelectedItem())) {
+            for (ComboBox<String> pinTypeComboBox : pinTypeComboBoxes) {
+                if (Pin.SPI.equals(pinTypeComboBox.getSelectionModel().getSelectedItem())) {
+                    int comboBoxId = Integer.valueOf(pinTypeComboBox.getId()) - 1;
+                    checkBoxes.get(comboBoxId).setSelected(true);
+                }
             }
         }
     }
 
     private void disableRowElements(int checkBoxId) {
+        ComboBox currentPinTypeComboBox = pinTypeComboBoxes.get(checkBoxId);
         inputOutputComboBoxes.get(checkBoxId).setDisable(true);
-        pinTypeComboBoxes.get(checkBoxId).setDisable(true);
+        currentPinTypeComboBox.setDisable(true);
         buttons.get(checkBoxId).setDisable(true);
-        for (ComboBox<String> comboBox : pinTypeComboBoxes) {
-            if (Pin.I2C.equals(comboBox.getSelectionModel().getSelectedItem())) {
-                int comboBoxId = Integer.valueOf(comboBox.getId()) - 1;
-                checkBoxes.get(comboBoxId).setSelected(false);
+        if (Pin.I2C.equals(currentPinTypeComboBox.getSelectionModel().getSelectedItem())) {
+            for (ComboBox<String> pinTypeComboBox : pinTypeComboBoxes) {
+                if (Pin.I2C.equals(pinTypeComboBox.getSelectionModel().getSelectedItem())) {
+                    int comboBoxId = Integer.valueOf(pinTypeComboBox.getId()) - 1;
+                    checkBoxes.get(comboBoxId).setSelected(false);
+                }
+            }
+        } else if (Pin.SPI.equals(currentPinTypeComboBox.getSelectionModel().getSelectedItem())) {
+            for (ComboBox<String> pinTypeComboBox : pinTypeComboBoxes) {
+                if (Pin.SPI.equals(pinTypeComboBox.getSelectionModel().getSelectedItem())) {
+                    int comboBoxId = Integer.valueOf(pinTypeComboBox.getId()) - 1;
+                    checkBoxes.get(comboBoxId).setSelected(false);
+                }
             }
         }
     }
@@ -302,7 +320,7 @@ public class BeagleBoneLayout implements EmbeddedLayout {
         }
     }
 
-    private void synchronizeI2cElements(ComboBox<String> pinTypeComboBox) {
+    private void synchronizePinElements(ComboBox<String> pinTypeComboBox) {
         String pinTypeSelectedItem = pinTypeComboBox.getSelectionModel().getSelectedItem();
         if (Pin.I2C.equals(pinTypeSelectedItem)) {
             for (ComboBox<String> comboBox : pinTypeComboBoxes) {
@@ -311,10 +329,26 @@ public class BeagleBoneLayout implements EmbeddedLayout {
                     checkBoxes.get(Integer.valueOf(comboBox.getId()) - 1).setSelected(true);
                 }
             }
-        } else if (Pin.GPIO.equals(pinTypeSelectedItem) && pinTypeComboBox.getItems().contains(Pin.I2C)) {
+        } else if (Pin.SPI.equals(pinTypeSelectedItem) && pinTypeComboBox.getItems().contains(Pin.SPI)) {
             for (ComboBox<String> comboBox : pinTypeComboBoxes) {
-                if (comboBox.getItems().contains(Pin.I2C)) {
-                    comboBox.getSelectionModel().select(Pin.GPIO);
+                if (comboBox.getItems().contains(Pin.SPI)) {
+                    comboBox.getSelectionModel().select(Pin.SPI);
+                    checkBoxes.get(Integer.valueOf(comboBox.getId()) - 1).setSelected(true);
+                }
+            }
+        } else if (Pin.GPIO.equals(pinTypeSelectedItem)) {
+            if (pinTypeComboBox.getItems().contains(Pin.I2C)) {
+                for (ComboBox<String> comboBox : pinTypeComboBoxes) {
+                    if (comboBox.getItems().contains(Pin.I2C)) {
+                        comboBox.getSelectionModel().select(Pin.GPIO);
+                    }
+                }
+            }
+            if (pinTypeComboBox.getItems().contains(Pin.SPI)) {
+                for (ComboBox<String> comboBox : pinTypeComboBoxes) {
+                    if (comboBox.getItems().contains(Pin.SPI)) {
+                        comboBox.getSelectionModel().select(Pin.GPIO);
+                    }
                 }
             }
         }

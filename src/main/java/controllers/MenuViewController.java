@@ -25,7 +25,6 @@ public class MenuViewController {
     private final static String WRONG_IP_FORMAT = "Wrong IP address format";
     private final static String NO_EMBEDDED_CHOSEN = "Choose embedded type before saving.";
     private final static String NO_FILE_AVAILABLE = "No embedded configuration is set. Add system configuration before being able to load any.";
-    private final static String DEFAULT_SYSTEM_TYPE = "Cannot process system type. Select from available options.";
     private final static String DEFAULT_AVAILABLE_SYSTEM = "Selected layout is already visible or no layout was chosen.";
     private final static String SEND_I2C_BY_BUTTON = "Send I2C by clicking on appropriate button in layout.";
     private final static String SEND_SPI_BY_BUTTON = "Send SPI by clicking on appropriate button in layout.";
@@ -120,6 +119,36 @@ public class MenuViewController {
 
     @FXML
     private void connect(ActionEvent event) throws IOException {
+        // TODO: 19.8.2016 mozno popup
+        if (event == null) {
+            if (networking.connect(selectedSystemIpFromComboBox)) {
+                root.showEmbeddedLayout(selectedSystemTypeFromComboBox);
+                logger.log(selectedSystemTypeFromComboBox + " layout loaded.");
+                setButtonsAfterConnect();
+            }
+        } else {
+            String ipAddress = ipAddressTextField.getText();
+            if (validations.isIpAddress(ipAddress)) {
+                if (networking.connect(ipAddress)) {
+                    root.showEmbeddedLayout(selectedSystemTypeFromButton);
+                    logger.log(selectedSystemTypeFromButton + " layout loaded.");
+                    setButtonsAfterConnect();
+                }
+            }
+        }
+        // TODO: 21.8.2016 if popup tak tu koniec popup
+    }
+
+    @FXML
+    private void disconnect() {
+        boolean connected = networking.disconnect();
+        if (!connected) {
+            setButtonsAfterDisconnect();
+            root.removeEmbeddedLayout();
+        }
+    }
+
+    private void setButtonsAfterConnect() {
         connectButton.setDisable(true);
         disconnectButton.setDisable(false);
         ipAddressTextField.setDisable(true);
@@ -127,31 +156,10 @@ public class MenuViewController {
         embeddedLayoutCheckBox.setDisable(false);
         pinRequestCheckBox.setDisable(false);
         refreshRateTextField.setDisable(false);
-//        pinRequestButton.setDisable(false);
         disconnectButton.requestFocus();
-        if (event == null) {
-            // TODO: 18.8.2016 NETWORK_OP
-            // TODO: 19.8.2016 mozno popup 
-            boolean connected = networking.connect(selectedSystemIpFromComboBox);
-            if (connected) {
-                root.showEmbeddedLayout(selectedSystemTypeFromComboBox);
-                logger.log(selectedSystemTypeFromComboBox + " layout loaded.");
-            }
-        } else {
-            String ipAddress = ipAddressTextField.getText();
-            if (validations.isIpAddress(ipAddress)) {
-                // TODO: 18.8.2016 NETWORK_OP
-                boolean connected = networking.connect(ipAddress);
-                if (connected) {
-                    root.showEmbeddedLayout(selectedSystemTypeFromButton);
-                    logger.log(selectedSystemTypeFromButton + " layout loaded.");
-                }
-            }
-        }
     }
 
-    @FXML
-    private void disconnect() {
+    private void setButtonsAfterDisconnect() {
         if (validations.isIpAddress(ipAddressTextField.getText())) {
             connectButton.setDisable(false);
             connectButton.requestFocus();
@@ -168,8 +176,6 @@ public class MenuViewController {
             pinRequestCheckBox.setSelected(false);
             toggleRequestPinStatus();
         }
-        root.removeEmbeddedLayout();
-        networking.disconnect();
     }
 
     @FXML
@@ -304,8 +310,6 @@ public class MenuViewController {
 
         if (selectedSystemType != null && !selectedSystemType.isEmpty()) {
             this.selectedSystemTypeFromButton = selectedSystemType;
-        } else {
-            logger.log(DEFAULT_SYSTEM_TYPE);
         }
     }
 

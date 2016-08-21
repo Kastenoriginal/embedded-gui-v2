@@ -33,7 +33,6 @@ class Disconnect implements Callable<NetworkingParams> {
                     if (params.message.equals(DISCONNECT_RESPONSE)) {
                         disconnect();
                     }
-                    return params;
                 } else {
                     return null;
                 }
@@ -43,7 +42,8 @@ class Disconnect implements Callable<NetworkingParams> {
         } catch (IOException e) {
             logger.log(e.toString());
         }
-        return null;
+        params.connected = false;
+        return params;
     }
 
     private void disconnect() {
@@ -60,7 +60,6 @@ class Disconnect implements Callable<NetworkingParams> {
             } else {
                 logger.log(CONNECTION_ALREADY_CLOSED);
             }
-            params.connected = false;
         }
     }
 }

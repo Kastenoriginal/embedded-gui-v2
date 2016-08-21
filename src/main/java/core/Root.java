@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -30,6 +31,7 @@ public class Root extends Application {
 
     static final String CSS_FILE = Root.class.getClassLoader().getResource("Style.css").toExternalForm();
     private final static String APPLICATION_TITLE = "Embedded GUI";
+    private static final String APPLICATION_IMAGE = "/embedded_icon.png";
     private final static URL ROOT_VIEW = Root.class.getResource("/rootView.fxml");
     private final static URL MENU_VIEW = Root.class.getResource("/menuView.fxml");
     private final static URL LOG_VIEW = Root.class.getResource("/logView.fxml");
@@ -42,7 +44,7 @@ public class Root extends Application {
     private final static String ROOT_INITIALIZATION_FAILED = "Root layout initialization failed";
     private final static String MENU_INITIALIZATION_FAILED = "Menu layout initialization failed";
     private final static String LOG_INITIALIZATION_FAILED = "Log layout initialization failed";
-    private final static String FXML_FILE_NOT_FOUND = "Cannot load .fxml file for appropriate layout";
+    private final static String FXML_FILE_NOT_FOUND = "Cannot load layout file.";
     private final static String LAYOUT_UNKNOWN = "Unknown layout.";
     private final static String CANNOT_SEND_MACRO = "Cannot send macro. Please send macro with appropriate button.";
     private final static String CANNOT_SEND_I2C = "Cannot send I2C message. Please choose I2C option to send valid I2C message";
@@ -68,6 +70,7 @@ public class Root extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(APPLICATION_TITLE);
+        this.primaryStage.getIcons().add(new Image(APPLICATION_IMAGE));
 
         networking = new Networking();
 
@@ -95,18 +98,15 @@ public class Root extends Application {
             primaryStage.setHeight(primaryScreenBounds.getHeight());
 
             primaryStage.setScene(scene);
-            primaryStage.setMaximized(true);
+//            primaryStage.setMaximized(true);
             primaryStage.setResizable(false);
 
             primaryStage.show();
 
-            primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                @Override
-                public void handle(WindowEvent event) {
-                    networking.disconnect();
-                    Platform.exit();
-                    System.exit(0);
-                }
+            primaryStage.setOnCloseRequest(event -> {
+                networking.disconnect();
+                Platform.exit();
+                System.exit(0);
             });
         } catch (IOException e) {
             throw new RuntimeException(ROOT_INITIALIZATION_FAILED, e);

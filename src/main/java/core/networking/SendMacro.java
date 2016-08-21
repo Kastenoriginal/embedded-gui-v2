@@ -3,6 +3,7 @@ package core.networking;
 import core.Logger;
 import core.Pin;
 import core.Validations;
+import javafx.application.Platform;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,10 +29,11 @@ class SendMacro implements Callable<NetworkingParams> {
     public NetworkingParams call() throws Exception {
         for (String command : commands) {
             command = command.substring(0, command.lastIndexOf(";"));
-            logger.log("Sending: " + command);
+            String finalCommand = command;
+            Platform.runLater(() -> logger.log("Sending: " + finalCommand));
             sendMacroCommand(command);
         }
-        logger.log("Macro sent.");
+        Platform.runLater(() -> logger.log("Macro sent."));
         return params;
     }
 
@@ -63,12 +65,12 @@ class SendMacro implements Callable<NetworkingParams> {
             Pin pin = new Pin(pinId, "O", "SPI");
             networkingParams = new SendValueToSpiPin(getDateAndTime(), params, logger, pin, address, hexaCommand).call();
         } else {
-            logger.log("Not supported command in macro.");
+            Platform.runLater(() -> logger.log("Not supported command in macro."));
             return;
         }
 
         if (networkingParams != null) {
-            logger.log(networkingParams.message);
+            Platform.runLater(() -> logger.log(networkingParams.message));
         }
     }
 

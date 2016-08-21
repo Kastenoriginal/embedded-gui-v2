@@ -2,6 +2,7 @@ package core.networking;
 
 import core.Logger;
 import core.Pin;
+import javafx.application.Platform;
 
 import java.util.concurrent.Callable;
 
@@ -31,20 +32,20 @@ class SendValueToSpiPin implements Callable<NetworkingParams> {
         if (params != null) {
             if (pin.getPinId() < TWO_DIGITS_VALUE) {
                 String spiMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + ADDRESS_PREFIX + address + message;
-                logger.log("Sending: " + spiMessage);
-                params.out.println(message);
+                Platform.runLater(() -> logger.log("Sending: " + spiMessage));
+                params.out.println(spiMessage);
             } else {
                 String spiMessage = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + ADDRESS_PREFIX + address + message;
-                logger.log("Sending: " + spiMessage);
-                params.out.println(message);
+                Platform.runLater(() -> logger.log("Sending: " + spiMessage));
+                params.out.println(spiMessage);
             }
 
             // TODO: 16.8.2016 uncomment when spi response will be implemented on server side (and test it then)
             String response = params.in.readLine();
             params.message = response;
-            logger.log(response);
+            Platform.runLater(() -> logger.log(response));
         } else {
-            logger.log("Not connected. Cannot send SPI message.");
+            Platform.runLater(() -> logger.log("Not connected. Cannot send SPI message."));
         }
         return params;
     }

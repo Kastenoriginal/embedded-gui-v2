@@ -33,7 +33,7 @@ public class Networking {
         this.logger = logger;
     }
 
-    public boolean connect(String ipAddress) {
+    public synchronized boolean connect(String ipAddress) {
         try {
             params = connectionService.submit(new Connect(ipAddress, logger)).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -42,19 +42,25 @@ public class Networking {
         return params.connected;
     }
 
-    public synchronized void disconnect() {
-        try {
-            connectionService.submit(new Disconnect(params, logger)).get();
-        } catch (InterruptedException | ExecutionException e) {
-            logger.log(e.toString());
+    public synchronized boolean disconnect() {
+        //already disconnected
+        if (params != null) {
+            try {
+                connectionService.submit(new Disconnect(params, logger)).get();
+                return params.connected;
+            } catch (InterruptedException | ExecutionException e) {
+                logger.log("Disconnecting without notifying server.");
+                return false;
+            }
         }
+        return false;
     }
 
     public synchronized void toggleGpioPin(Pin pin) {
         try {
             connectionService.submit(new ToggleGpioPin(getDateAndTime(), params, logger, pin)).get();
         } catch (InterruptedException | ExecutionException e) {
-            logger.log(e.toString());
+            logger.log("Server did not responded on command.");
         }
     }
 
@@ -62,7 +68,7 @@ public class Networking {
         try {
             connectionService.submit(new SendValueToI2CPin(getDateAndTime(), params, logger, pin, address, message)).get();
         } catch (InterruptedException | ExecutionException e) {
-            logger.log(e.toString());
+            logger.log("Server did not responded on command.");
         }
     }
 
@@ -70,14 +76,13 @@ public class Networking {
         try {
             connectionService.submit(new SendValueToSpiPin(getDateAndTime(), params, logger, pin, address, message)).get();
         } catch (InterruptedException | ExecutionException e) {
-            logger.log(e.toString());
+            logger.log("Server did not responded on command.");
         }
     }
 
     public synchronized void startRequestPinStatus(EmbeddedLayout callback, int refreshRate, final List<Pin> pins) {
         this.refreshRate = refreshRate;
         this.pins = pins;
-        // TODO: 15.8.2016 ScheduledFuture bude asi topka ale treba testovat so serverom
         scheduledService = Executors.newSingleThreadScheduledExecutor();
         final StartRequestPinStatus status = new StartRequestPinStatus(callback, params, logger, getDateAndTime(), pins);
         scheduledService.scheduleAtFixedRate(new Runnable() {
