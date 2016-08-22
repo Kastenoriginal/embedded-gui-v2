@@ -18,24 +18,26 @@ class ToggleGpioPin implements Callable<NetworkingParams> {
     private String dateAndTime;
     private Logger logger;
     private Pin pin;
+    private String pinValue;
 
-    ToggleGpioPin(EmbeddedLayout callback, String dateAndTime, NetworkingParams params, Logger logger, Pin pin) {
+    ToggleGpioPin(EmbeddedLayout callback, String dateAndTime, NetworkingParams params, Logger logger, Pin pin, String pinValue) {
         this.callback = callback;
         this.params = params;
         this.dateAndTime = dateAndTime;
         this.logger = logger;
         this.pin = pin;
+        this.pinValue = pinValue;
     }
 
     @Override
     public NetworkingParams call() throws Exception {
         if (params != null) {
             if (pin.getPinId() < TWO_DIGITS_VALUE) {
-                String message = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + "1";
+                String message = dateAndTime + pin.getIoType() + pin.getPinType() + ":0" + pin.getPinId() + pinValue;
                 Platform.runLater(() -> logger.log("Sending: " + message));
                 params.out.println(message);
             } else {
-                String message = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + "1";
+                String message = dateAndTime + pin.getIoType() + pin.getPinType() + ":" + pin.getPinId() + pinValue;
                 Platform.runLater(() -> logger.log("Sending: " + message));
                 params.out.println(message);
             }

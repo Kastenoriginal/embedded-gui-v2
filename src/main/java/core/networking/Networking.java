@@ -58,7 +58,8 @@ public class Networking {
 
     public synchronized void toggleGpioPin(EmbeddedLayout callback, Pin pin) {
         try {
-            connectionService.submit(new ToggleGpioPin(callback, getDateAndTime(), params, logger, pin)).get();
+            String pinValue = "";
+            connectionService.submit(new ToggleGpioPin(callback, getDateAndTime(), params, logger, pin, pinValue)).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.log("Server did not responded on command.");
         }

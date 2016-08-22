@@ -57,7 +57,18 @@ class SendMacro implements Callable<NetworkingParams> {
         if (command.startsWith("GPIO")) {
             pinId = Integer.valueOf(command.substring(5, 7));
             Pin pin = new Pin(pinId, "O", "GPIO");
-            networkingParams = new ToggleGpioPin(pinCallback, getDateAndTime(), params, logger, pin).call();
+            String pinValue;
+            if (command.substring(command.length() - 1).equals("1")) {
+                pinValue = "1";
+                pin.setValue(true);
+            } else if (command.substring(command.length() - 1).equals("0")) {
+                pinValue = "0";
+                pin.setValue(false);
+            } else {
+                //Something went wrong. Setting no value. Server handles no value on GPIO pin as toggle.
+                pinValue = "";
+            }
+            networkingParams = new ToggleGpioPin(pinCallback, getDateAndTime(), params, logger, pin, pinValue).call();
         } else if (command.startsWith("I2C")) {
             address = command.substring(4, 6);
             pinId = Integer.valueOf(command.substring(6, 8));
