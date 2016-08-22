@@ -35,6 +35,6 @@ public class CubieBoardLayout implements EmbeddedLayout{
     }
 
     @Override
-    public void updatePinsStatus(List<Pin> pins) {
+    public void setColorOnPins(List<Pin> pins) {
     }
 }

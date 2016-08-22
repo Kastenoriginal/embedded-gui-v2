@@ -38,7 +38,7 @@ public class Pin {
         return pinType;
     }
 
-    public boolean isValue() {
+    public boolean isValuePositive() {
         return value;
     }
 

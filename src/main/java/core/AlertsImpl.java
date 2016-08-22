@@ -1,11 +1,11 @@
 package core;
 
-import com.sun.istack.internal.NotNull;
 import javafx.scene.control.Alert;
 
 public class AlertsImpl implements Alerts {
 
-    public void createErrorAlert(String header, @NotNull String content) {
+    @Override
+    public void createErrorAlert(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(header);
@@ -13,7 +13,8 @@ public class AlertsImpl implements Alerts {
         alert.showAndWait();
     }
 
-    public void createInfoAlert(String header, @NotNull String content) {
+    @Override
+    public void createInfoAlert(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Information");
         alert.setHeaderText(header);
@@ -21,7 +22,8 @@ public class AlertsImpl implements Alerts {
         alert.showAndWait();
     }
 
-    public void createWarningAlert(String header, @NotNull String content) {
+    @Override
+    public void createWarningAlert(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Warning");
         alert.setHeaderText(header);
@@ -29,7 +31,8 @@ public class AlertsImpl implements Alerts {
         alert.showAndWait();
     }
 
-    public Alert createConfirmationAlert(String header, @NotNull String content) {
+    @Override
+    public Alert createConfirmationAlert(String header, String content) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
         alert.setHeaderText(header);

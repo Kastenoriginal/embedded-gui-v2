@@ -1,6 +1,9 @@
 package layouts;
 
-import core.*;
+import core.AlertsImpl;
+import core.Logger;
+import core.Pin;
+import core.Root;
 import core.hashmaps.BeagleBoneHashMap;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -8,7 +11,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 
 import java.util.ArrayList;
@@ -29,8 +34,10 @@ public class BeagleBoneLayout implements EmbeddedLayout {
     private final static int ELEMENTS_COUNT = PIN_COUNT * ELEMENTS_FOR_ROW_COUNT;
     private final static String GPIO_OUTPUT = "OUT";
     private final static String GPIO_INPUT = "IN";
-    private static final String BUTTON_FONT_SIZE = "-fx-font-size: 12";
     private static final String LAYOUT_CREATION_FAILED = "Creation of layout failed.";
+    private static final String BUTTON_COLOR_RED = "-fx-background-color: #ff9999;-fx-text-fill: black;-fx-font-size: 9pt;";
+    private static final String BUTTON_COLOR_GREEN = "-fx-background-color: #99ff99;-fx-text-fill: black;-fx-font-size: 9pt;";
+    private static final String DEFAULT_BUTTON_STYLE = "/Style.css";
 
     private Root root;
     private Logger logger;
@@ -142,6 +149,9 @@ public class BeagleBoneLayout implements EmbeddedLayout {
             public void changed(ObservableValue observableValue, Boolean oldValue, Boolean newValue) {
                 int checkBoxId = Integer.valueOf(checkBox.getId()) - 1;
 
+                buttons.get(checkBoxId).setStyle(DEFAULT_BUTTON_STYLE);
+                buttons.get(checkBoxId).setStyle("-fx-font-size: 9pt");
+
                 toggleElementsEnabled(newValue, checkBoxId);
 
                 String buttonText = buttons.get(checkBoxId).getText().trim();
@@ -213,8 +223,8 @@ public class BeagleBoneLayout implements EmbeddedLayout {
     private void addButtonToLayout() {
         final Button button = new Button();
         button.setId(String.valueOf(buttonId));
+        button.setStyle("-fx-font-size: 9pt;");
         button.setUserData('0');
-        button.setStyle(BUTTON_FONT_SIZE);
         button.setMinSize(BUTTON_MIN_SIZE_WIDTH, BUTTON_MIN_SIZE_HEIGHT);
         button.setText(String.valueOf(buttonId));
         buttons.add(button);
@@ -375,7 +385,14 @@ public class BeagleBoneLayout implements EmbeddedLayout {
     }
 
     @Override
-    public void updatePinsStatus(List<Pin> pins) {
-        // TODO: 19.8.2016 skopirovat z RPI layoutu ked to tam bude hotove
+    public void setColorOnPins(List<Pin> pins) {
+        for (Pin pin : pins) {
+            int pinId = pin.getPinId() - 1;
+            if (pin.isValuePositive()) {
+                buttons.get(pinId).setStyle(BUTTON_COLOR_GREEN);
+            } else {
+                buttons.get(pinId).setStyle(BUTTON_COLOR_RED);
+            }
+        }
     }
 }

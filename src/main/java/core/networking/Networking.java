@@ -56,9 +56,9 @@ public class Networking {
         return false;
     }
 
-    public synchronized void toggleGpioPin(Pin pin) {
+    public synchronized void toggleGpioPin(EmbeddedLayout callback, Pin pin) {
         try {
-            connectionService.submit(new ToggleGpioPin(getDateAndTime(), params, logger, pin)).get();
+            connectionService.submit(new ToggleGpioPin(callback, getDateAndTime(), params, logger, pin)).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.log("Server did not responded on command.");
         }
@@ -117,8 +117,8 @@ public class Networking {
         startRequestPinStatus(callback, this.refreshRate, pins);
     }
 
-    public synchronized void sendMacro(List<String> commands) {
-        connectionService.submit(new SendMacro(params, logger, commands));
+    public synchronized void sendMacro(EmbeddedLayout pinCallback, PopupDismiss popupCallback, List<String> commands) {
+        connectionService.submit(new SendMacro(pinCallback, popupCallback, params, logger, commands));
     }
 
     private String getDateAndTime() {

@@ -2,12 +2,17 @@ package controllers;
 
 import core.*;
 import core.networking.Networking;
+import core.networking.PopupDismiss;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import layouts.EmbeddedLayout;
 import models.MenuViewModel;
 
@@ -16,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MenuViewController {
+public class MenuViewController implements PopupDismiss {
 
     private final static String RPI_IMAGE = "-fx-background-image: url(\"/RPI_layout.jpg\");-fx-background-repeat: no-repeat;-fx-background-position: bottom left";
     private final static String BBB_IMAGE = "-fx-background-image: url(\"/BBB_layout.jpg\");-fx-background-repeat: no-repeat;-fx-background-position: bottom left";
@@ -35,6 +40,8 @@ public class MenuViewController {
 
     private Root root;
 
+    private Stage stage;
+
     private MenuViewModel menuViewModel;
     private AlertsImpl alerts;
     private Validations validations;
@@ -45,6 +52,7 @@ public class MenuViewController {
     private Networking networking;
     private Logger logger;
     private int refreshRate = -1;
+
     @FXML
     private TextField ipAddressTextField;
 
@@ -119,7 +127,6 @@ public class MenuViewController {
 
     @FXML
     private void connect(ActionEvent event) throws IOException {
-        // TODO: 19.8.2016 mozno popup
         if (event == null) {
             if (networking.connect(selectedSystemIpFromComboBox)) {
                 root.showEmbeddedLayout(selectedSystemTypeFromComboBox);
@@ -136,7 +143,6 @@ public class MenuViewController {
                 }
             }
         }
-        // TODO: 21.8.2016 if popup tak tu koniec popup
     }
 
     @FXML
@@ -149,29 +155,39 @@ public class MenuViewController {
     }
 
     private void setButtonsAfterConnect() {
-        connectButton.setDisable(true);
-        disconnectButton.setDisable(false);
         ipAddressTextField.setDisable(true);
         embeddedTypeComboBox.setDisable(true);
+        connectButton.setDisable(true);
+        disconnectButton.setDisable(false);
+        addButton.setDisable(true);
         embeddedLayoutCheckBox.setDisable(false);
         pinRequestCheckBox.setDisable(false);
         refreshRateTextField.setDisable(false);
-        disconnectButton.requestFocus();
+
+        addressTextField.setDisable(false);
+        messagesTextArea.setDisable(false);
+        messagesTextArea.requestFocus();
+        sendButton.setDisable(false);
     }
 
     private void setButtonsAfterDisconnect() {
+        ipAddressTextField.setDisable(false);
+        embeddedTypeComboBox.setDisable(false);
         if (validations.isIpAddress(ipAddressTextField.getText())) {
             connectButton.setDisable(false);
             connectButton.requestFocus();
         }
+        disconnectButton.setDisable(true);
+        setButtonsEnabled();
+        embeddedLayoutCheckBox.setSelected(false);
         embeddedLayoutCheckBox.setDisable(true);
         pinRequestCheckBox.setDisable(true);
         refreshRateTextField.setDisable(true);
         updateRefreshRateButton.setDisable(true);
-        embeddedTypeComboBox.setDisable(false);
-        ipAddressTextField.setDisable(false);
-        disconnectButton.setDisable(true);
-        embeddedLayoutCheckBox.setSelected(false);
+
+        addressTextField.setDisable(true);
+        messagesTextArea.setDisable(true);
+        sendButton.setDisable(true);
         if (pinRequestCheckBox.isSelected()) {
             pinRequestCheckBox.setSelected(false);
             toggleRequestPinStatus();
@@ -337,7 +353,7 @@ public class MenuViewController {
     @FXML
     public void validatePhysicalAddress() {
         String addressText = addressTextField.getText();
-        if (addressTextField.getText() == null || addressTextField.getText().isEmpty()) {
+        if (addressTextField.getText() == null) {
             return;
         }
         validations.setAddressValidationBorder(addressText, addressTextField);
@@ -367,36 +383,9 @@ public class MenuViewController {
                     logger.log("Commands are not valid");
                     return;
                 }
-                // TODO: 18.8.2016  vyvolaj popup
-
-
-
-
-//                Alert alert = new Alert(Alert.AlertType.NONE);
-//                alert.setContentText("Sending macro...");
-//                alert.show();
-
-
-                logger.log("Macro zacalo.");
-
-                networking.sendMacro(commands);
-
-                logger.log("Macro skoncilo.");
-
-
-
-
-
-
-//                ButtonType buttonType = new ButtonType("", ButtonBar.ButtonData.CANCEL_CLOSE);
-//                alert.getButtonTypes().setAll(buttonType);
-//                Button cancel = (Button) alert.getDialogPane().lookupButton(buttonType);
-//                cancel.fire();
-
-
-
-
-                // TODO: 18.8.2016 zavri popup
+                createMacroPopup();
+                EmbeddedLayout callback = root.getRequestStatusCallback();
+                networking.sendMacro(callback, this, commands);
                 break;
             case OBSERVABLE_I2C_TEXT:
                 logger.log(SEND_I2C_BY_BUTTON);
@@ -407,6 +396,24 @@ public class MenuViewController {
                 alerts.createInfoAlert(null, SEND_SPI_BY_BUTTON);
                 break;
         }
+    }
+
+    private void createMacroPopup() {
+        Label label = new Label(" Sending macro... ");
+        label.setStyle("-fx-background-color: #03A9F4;-fx-text-fill: white;-fx-font-size: 60pt;");
+        Scene scene = new Scene(label);
+
+        stage = new Stage();
+        stage.initStyle(StageStyle.UNDECORATED);
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner(root.getRootLayout().getScene().getWindow());
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @Override
+    public void dismissPopup() {
+        stage.close();
     }
 
     public String getAddress() {

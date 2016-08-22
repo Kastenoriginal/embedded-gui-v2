@@ -47,8 +47,8 @@ public class Root extends Application {
     private final static String FXML_FILE_NOT_FOUND = "Cannot load layout file.";
     private final static String LAYOUT_UNKNOWN = "Unknown layout.";
     private final static String CANNOT_SEND_MACRO = "Cannot send macro. Please send macro with appropriate button.";
-    private final static String CANNOT_SEND_I2C = "Cannot send I2C message. Please choose I2C option to send valid I2C message";
-    private final static String CANNOT_SEND_SPI = "Cannot send SPI message. Please choose SPI option to send valid SPI message";
+    private final static String CANNOT_SEND_I2C = "Cannot send I2C message. Click on appropriate I2C button to send valid I2C message";
+    private final static String CANNOT_SEND_SPI = "Cannot send SPI message. Click on appropriate SPI button to send valid SPI message";
     private static final String MESSAGE_SEND_FAILED = "Failed to send message";
 
     private Networking networking;
@@ -240,7 +240,7 @@ public class Root extends Application {
                     break;
             }
         } else {
-            networking.toggleGpioPin(pin);
+            networking.toggleGpioPin(getRequestStatusCallback(), pin);
             logger.log("Pin " + pin.getPinId() + " sent.");
         }
     }

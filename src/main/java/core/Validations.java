@@ -148,7 +148,7 @@ public class Validations {
     }
 
     public boolean isPhysicalAddressValid(String input) {
-        return isSingleHexaString(input) && input.length() == 2;
+        return isHexaNumberSevenBit(input) && isSingleHexaString(input) && input.length() == 2;
     }
 
     public void setTextAreaValidationBorder(TextArea textarea, int item) {
@@ -186,6 +186,15 @@ public class Validations {
             }
         } else {
             textField.setStyle(RED_BORDER);
+            return false;
+        }
+    }
+
+    private boolean isHexaNumberSevenBit(String input) {
+        try {
+            Byte b = Byte.decode("0x" + input);
+            return b <= 127 && b >= 0;
+        } catch (NumberFormatException e) {
             return false;
         }
     }

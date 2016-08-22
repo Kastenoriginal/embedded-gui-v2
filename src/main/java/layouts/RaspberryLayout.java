@@ -30,10 +30,10 @@ public class RaspberryLayout implements EmbeddedLayout {
     private final static int ELEMENTS_COUNT = PIN_COUNT * ELEMENTS_FOR_ROW_COUNT;
     private final static String GPIO_OUTPUT = "OUT";
     private final static String GPIO_INPUT = "IN";
-    private static final String BUTTON_FONT_SIZE = "-fx-font-size: 12";
     private static final String LAYOUT_CREATION_FAILED = "Creation of layout failed.";
     private static final String BUTTON_COLOR_RED = "-fx-background-color: #ff9999;-fx-text-fill: black;-fx-font-size: 9pt;";
     private static final String BUTTON_COLOR_GREEN = "-fx-background-color: #99ff99;-fx-text-fill: black;-fx-font-size: 9pt;";
+    private static final String DEFAULT_BUTTON_STYLE = "/Style.css";
 
     private Root root;
     private Logger logger;
@@ -128,13 +128,16 @@ public class RaspberryLayout implements EmbeddedLayout {
         final CheckBox checkBox = new CheckBox();
         checkBox.setId(String.valueOf(checkBoxId));
         checkBox.selectedProperty().addListener((observableValue, oldValue, newValue) -> {
-            int checkBoxId1 = Integer.valueOf(checkBox.getId()) - 1;
+            int checkBoxId = Integer.valueOf(checkBox.getId()) - 1;
 
-            toggleElementsEnabled(newValue, checkBoxId1);
+            buttons.get(checkBoxId).setStyle(DEFAULT_BUTTON_STYLE);
+            buttons.get(checkBoxId).setStyle("-fx-font-size: 9pt");
 
-            String buttonText = buttons.get(checkBoxId1).getText().trim();
-            String ioType = inputOutputComboBoxes.get(checkBoxId1).getSelectionModel().getSelectedItem();
-            String pinType = pinTypeComboBoxes.get(checkBoxId1).getSelectionModel().getSelectedItem();
+            toggleElementsEnabled(newValue, checkBoxId);
+
+            String buttonText = buttons.get(checkBoxId).getText().trim();
+            String ioType = inputOutputComboBoxes.get(checkBoxId).getSelectionModel().getSelectedItem();
+            String pinType = pinTypeComboBoxes.get(checkBoxId).getSelectionModel().getSelectedItem();
 
             Pin pin = new Pin(Integer.valueOf(buttonText), ioType, pinType);
 
@@ -196,8 +199,8 @@ public class RaspberryLayout implements EmbeddedLayout {
     private void addButtonToLayout() {
         final Button button = new Button();
         button.setId(String.valueOf(buttonId));
+        button.setStyle("-fx-font-size: 9pt;");
         button.setUserData('0');
-        button.setStyle(BUTTON_FONT_SIZE);
         button.setMinSize(BUTTON_MIN_SIZE_WIDTH, BUTTON_MIN_SIZE_HEIGHT);
         button.setText(String.valueOf(buttonId));
         buttons.add(button);
@@ -352,19 +355,14 @@ public class RaspberryLayout implements EmbeddedLayout {
     }
 
     @Override
-    public void updatePinsStatus(List<Pin> pins) {
-
-        String randomColor = Math.random() > 0.5 ? BUTTON_COLOR_RED : BUTTON_COLOR_GREEN;
-
-        // TODO: 19.8.2016 kuknut eclipse metodu setUiFromResponse a podla toho co pride zo servera poriesit metodu ify atd...
+    public void setColorOnPins(List<Pin> pins) {
         for (Pin pin : pins) {
             int pinId = pin.getPinId() - 1;
-            if (pin.isValue()) {
-                buttons.get(pinId).setStyle(randomColor);
+            if (pin.isValuePositive()) {
+                buttons.get(pinId).setStyle(BUTTON_COLOR_GREEN);
             } else {
-                buttons.get(pinId).setStyle(randomColor);
+                buttons.get(pinId).setStyle(BUTTON_COLOR_RED);
             }
-
         }
     }
 }

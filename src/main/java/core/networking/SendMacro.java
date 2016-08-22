@@ -4,6 +4,7 @@ import core.Logger;
 import core.Pin;
 import core.Validations;
 import javafx.application.Platform;
+import layouts.EmbeddedLayout;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,12 +14,16 @@ import java.util.concurrent.Callable;
 
 class SendMacro implements Callable<NetworkingParams> {
 
+    private EmbeddedLayout pinCallback;
+    private PopupDismiss popupCallback;
     private List<String> commands;
     private NetworkingParams params;
     private Logger logger;
     private Validations validations;
 
-    SendMacro(NetworkingParams params, Logger logger, List<String> commands) {
+    SendMacro(EmbeddedLayout pinCallback, PopupDismiss popupCallback, NetworkingParams params, Logger logger, List<String> commands) {
+        this.pinCallback = pinCallback;
+        this.popupCallback = popupCallback;
         this.commands = commands;
         this.params = params;
         this.logger = logger;
@@ -34,6 +39,7 @@ class SendMacro implements Callable<NetworkingParams> {
             sendMacroCommand(command);
         }
         Platform.runLater(() -> logger.log("Macro sent."));
+        Platform.runLater(() -> popupCallback.dismissPopup());
         return params;
     }
 
@@ -51,7 +57,7 @@ class SendMacro implements Callable<NetworkingParams> {
         if (command.startsWith("GPIO")) {
             pinId = Integer.valueOf(command.substring(5, 7));
             Pin pin = new Pin(pinId, "O", "GPIO");
-            networkingParams = new ToggleGpioPin(getDateAndTime(), params, logger, pin).call();
+            networkingParams = new ToggleGpioPin(pinCallback, getDateAndTime(), params, logger, pin).call();
         } else if (command.startsWith("I2C")) {
             address = command.substring(4, 6);
             pinId = Integer.valueOf(command.substring(6, 8));
