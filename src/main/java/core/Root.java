@@ -196,7 +196,7 @@ public class Root extends Application {
         }
     }
 
-    public void handlePinButtonClick(Pin pin) {
+    public void handlePinButtonClick(Pin pin, boolean toggle) {
         String selectedCommandMode = menuViewController.getCommandMode();
         String pinType = pin.getPinType();
 
@@ -240,7 +240,7 @@ public class Root extends Application {
                     break;
             }
         } else {
-            networking.toggleGpioPin(getRequestStatusCallback(), pin);
+            networking.toggleGpioPin(getRequestStatusCallback(), pin, toggle);
             logger.log("Pin " + pin.getPinId() + " sent.");
         }
     }

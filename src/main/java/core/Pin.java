@@ -31,7 +31,7 @@ public class Pin {
     }
 
     public String getIoType() {
-        return ioType.substring(0,1);
+        return ioType.substring(0,1).toUpperCase();
     }
 
     public String getPinType() {

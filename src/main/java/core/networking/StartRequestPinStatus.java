@@ -33,10 +33,10 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
     @Override
     public NetworkingParams call() throws Exception {
         String pinsToRequest = "";
-        if (pinList != null || !pinList.isEmpty()) {
+        if (pinList != null && !pinList.isEmpty()) {
             for (Pin pin : pinList) {
                 if (pinsToRequest.isEmpty()) {
-                    pinsToRequest = String.valueOf(pin.getPinId());
+                    pinsToRequest = "" + pin.getPinId();
                 } else {
                     pinsToRequest = pinsToRequest + ";" + pin.getPinId();
                 }
@@ -45,8 +45,12 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
         String finalPinsToRequest = pinsToRequest;
         Platform.runLater(() -> logger.log("Requesting status for pins: " + finalPinsToRequest));
         params.out.println(dateAndTime + PIN_REQUEST_CODE + pinsToRequest);
+        // TODO: 23.8.2016 ked neni server online tu je socket exception
+        // TODO: 23.8.2016 toto vsetko bude sucastou checkovania toho ci je server najprv online ked chce daco poslat a ked nie (nepride odpoved) tak disconnect
+        // TODO: 24.8.2016 cize treba na serveri poriesit error handling sposobom ze zla odpoved aby neodpojilo od servera
         params.message = params.in.readLine();
 
+        Platform.runLater(() -> logger.log(params.message));
         params = setColorOnPins();
         return params;
     }

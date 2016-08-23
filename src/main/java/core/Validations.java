@@ -11,7 +11,7 @@ public class Validations {
 
     private final static int MIN_IP_ADDRESS_NUMBER = 0;
     private final static int MAX_IP_ADDRESS_NUMBER = 255;
-    private final static int MIN_THREAD_SLEEP_TIME = 100;
+    private final static int MIN_THREAD_SLEEP_TIME = 10;
     private final static int MAX_THREAD_SLEEP_TIME = 10000;
     private final static int GPIO_CONTENT_LENGTH = 3;
     private final static int GPIO_VALUE_POSITION = 2;

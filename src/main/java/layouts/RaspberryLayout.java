@@ -165,13 +165,20 @@ public class RaspberryLayout implements EmbeddedLayout {
         inputOutputComboBoxes.add(inputOutputComboBox);
         inputOutputComboBoxId++;
         inputOutputComboBox.setOnAction(arg0 -> {
-            Object currentlySelectedItem = inputOutputComboBox.getSelectionModel().getSelectedItem();
-            int inputOutputComboBoxId1 = Integer.valueOf(inputOutputComboBox.getId()) - 1;
+            String currentlySelectedItem = inputOutputComboBox.getSelectionModel().getSelectedItem();
+            int inputOutputComboBoxId = Integer.valueOf(inputOutputComboBox.getId()) - 1;
 
             if (GPIO_INPUT.equals(currentlySelectedItem)) {
-                buttons.get(inputOutputComboBoxId1).setDisable(true);
+                buttons.get(inputOutputComboBoxId).setDisable(true);
+                int pinId = Integer.valueOf(buttons.get(inputOutputComboBoxId).getText().trim());
+                Pin turnOffOutputPin = new Pin(pinId, GPIO_OUTPUT, Pin.GPIO);
+                turnOffOutputPin.setValue(false);
+                root.handlePinButtonClick(turnOffOutputPin, false);
+
+                Pin getInputPin = new Pin(pinId, GPIO_INPUT, Pin.GPIO);
+                root.handlePinButtonClick(getInputPin, true);
             } else {
-                buttons.get(inputOutputComboBoxId1).setDisable(false);
+                buttons.get(inputOutputComboBoxId).setDisable(false);
             }
         });
         gridPane.add(inputOutputComboBox, column, row);
@@ -213,7 +220,7 @@ public class RaspberryLayout implements EmbeddedLayout {
             String ioType = inputOutputComboBoxes.get(buttonId1).getSelectionModel().getSelectedItem();
 
             Pin pin = new Pin(Integer.valueOf(buttonText), ioType, pinType);
-            root.handlePinButtonClick(pin);
+            root.handlePinButtonClick(pin, true);
         });
         gridPane.add(button, column, row);
     }

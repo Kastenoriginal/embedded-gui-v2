@@ -186,11 +186,18 @@ public class BeagleBoneLayout implements EmbeddedLayout {
         inputOutputComboBoxId++;
         inputOutputComboBox.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent arg0) {
-                Object currentlySelectedItem = inputOutputComboBox.getSelectionModel().getSelectedItem();
+                String currentlySelectedItem = inputOutputComboBox.getSelectionModel().getSelectedItem();
                 int inputOutputComboBoxId = Integer.valueOf(inputOutputComboBox.getId()) - 1;
 
-                if (currentlySelectedItem.equals(GPIO_INPUT)) {
+                if (GPIO_INPUT.equals(currentlySelectedItem)) {
                     buttons.get(inputOutputComboBoxId).setDisable(true);
+                    int pinId = Integer.valueOf(buttons.get(inputOutputComboBoxId).getText().trim());
+                    Pin turnOffOutputPin = new Pin(pinId, GPIO_OUTPUT, Pin.GPIO);
+                    turnOffOutputPin.setValue(false);
+                    root.handlePinButtonClick(turnOffOutputPin, false);
+
+                    Pin getInputPin = new Pin(pinId, GPIO_INPUT, Pin.GPIO);
+                    root.handlePinButtonClick(getInputPin, true);
                 } else {
                     buttons.get(inputOutputComboBoxId).setDisable(false);
                 }
@@ -230,6 +237,7 @@ public class BeagleBoneLayout implements EmbeddedLayout {
         buttons.add(button);
         buttonId++;
         button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
             public void handle(ActionEvent arg0) {
                 int buttonId = Integer.valueOf(button.getId()) - 1;
 
@@ -238,7 +246,7 @@ public class BeagleBoneLayout implements EmbeddedLayout {
                 String ioType = inputOutputComboBoxes.get(buttonId).getSelectionModel().getSelectedItem();
 
                 Pin pin = new Pin(Integer.valueOf(buttonText), ioType, pinType);
-                root.handlePinButtonClick(pin);
+                root.handlePinButtonClick(pin, true);
             }
         });
         gridPane.add(button, column, row);
