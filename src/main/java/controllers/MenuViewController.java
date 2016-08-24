@@ -165,8 +165,13 @@ public class MenuViewController implements PopupDismiss, DisconnectCallback {
         embeddedLayoutCheckBox.setDisable(false);
         pinRequestCheckBox.setDisable(false);
         refreshRateTextField.setDisable(false);
-
-        addressTextField.setDisable(false);
+        if (textAreaComboBox.getSelectionModel().getSelectedIndex() == 0) {
+            addressTextField.setText("");
+            validations.setAddressValidationBorder("", addressTextField);
+            addressTextField.setDisable(true);
+        } else {
+            addressTextField.setDisable(false);
+        }
         messagesTextArea.setDisable(false);
         messagesTextArea.requestFocus();
         sendButton.setDisable(false);
@@ -186,7 +191,6 @@ public class MenuViewController implements PopupDismiss, DisconnectCallback {
         pinRequestCheckBox.setDisable(true);
         refreshRateTextField.setDisable(true);
         updateRefreshRateButton.setDisable(true);
-
         addressTextField.setDisable(true);
         messagesTextArea.setDisable(true);
         sendButton.setDisable(true);
