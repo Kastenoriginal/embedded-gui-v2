@@ -42,6 +42,7 @@ class Connect implements Callable<NetworkingParams> {
             }
         } catch (IOException e) {
             logger.log("Server not running on selected IP address");
+            params = null;
         }
         return params;
     }

@@ -1,8 +1,10 @@
 package controllers;
 
 import core.*;
+import core.networking.DisconnectCallback;
 import core.networking.Networking;
 import core.networking.PopupDismiss;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MenuViewController implements PopupDismiss {
+public class MenuViewController implements PopupDismiss, DisconnectCallback {
 
     private final static String RPI_IMAGE = "-fx-background-image: url(\"/RPI_layout.jpg\");-fx-background-repeat: no-repeat;-fx-background-position: bottom left";
     private final static String BBB_IMAGE = "-fx-background-image: url(\"/BBB_layout.jpg\");-fx-background-repeat: no-repeat;-fx-background-position: bottom left";
@@ -128,7 +130,7 @@ public class MenuViewController implements PopupDismiss {
     @FXML
     private void connect(ActionEvent event) throws IOException {
         if (event == null) {
-            if (networking.connect(selectedSystemIpFromComboBox)) {
+            if (networking.connect(this, selectedSystemIpFromComboBox)) {
                 root.showEmbeddedLayout(selectedSystemTypeFromComboBox);
                 logger.log(selectedSystemTypeFromComboBox + " layout loaded.");
                 setButtonsAfterConnect();
@@ -136,7 +138,7 @@ public class MenuViewController implements PopupDismiss {
         } else {
             String ipAddress = ipAddressTextField.getText();
             if (validations.isIpAddress(ipAddress)) {
-                if (networking.connect(ipAddress)) {
+                if (networking.connect(this, ipAddress)) {
                     root.showEmbeddedLayout(selectedSystemTypeFromButton);
                     logger.log(selectedSystemTypeFromButton + " layout loaded.");
                     setButtonsAfterConnect();
@@ -272,7 +274,7 @@ public class MenuViewController implements PopupDismiss {
             validateAndChangeRefreshRate();
             List<Pin> pins = root.getCheckedPins();
             EmbeddedLayout callback = root.getRequestStatusCallback();
-            networking.startRequestPinStatus(callback, refreshRate, pins);
+            networking.startRequestPinStatus(this, callback, refreshRate, pins);
         } else {
             refreshRateTextField.setDisable(true);
             updateRefreshRateButton.setDisable(true);
@@ -298,7 +300,7 @@ public class MenuViewController implements PopupDismiss {
     private void changeRefreshRate() {
         String refreshRate = refreshRateTextField.getText();
         EmbeddedLayout callback = root.getRequestStatusCallback();
-        networking.updateRequestRefreshRate(callback, Integer.valueOf(refreshRate));
+        networking.updateRequestRefreshRate(this, callback, Integer.valueOf(refreshRate));
         logger.log("Refresh rate updated to " + refreshRate);
     }
 
@@ -362,6 +364,14 @@ public class MenuViewController implements PopupDismiss {
     @FXML
     private void validateTextArea() {
         int textAreaSelectedItem = textAreaComboBox.getSelectionModel().getSelectedIndex();
+        if (textAreaSelectedItem == 0) {
+            addressTextField.setText("");
+            validations.setAddressValidationBorder("", addressTextField);
+            addressTextField.setDisable(true);
+        } else {
+            addressTextField.setDisable(false);
+        }
+
         String textAreaText = messagesTextArea.getText();
 
         validations.setTextAreaValidationBorder(messagesTextArea, textAreaSelectedItem);
@@ -430,5 +440,11 @@ public class MenuViewController implements PopupDismiss {
 
     public boolean isSendRequestCheckBoxChecked() {
         return pinRequestCheckBox.isSelected();
+    }
+
+    @Override
+    public void serverDisconnected() {
+        disconnect();
+        Platform.runLater(() -> alerts.createWarningAlert(null, "Server not available. Client disconnected."));
     }
 }

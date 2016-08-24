@@ -65,7 +65,7 @@ class SendMacro implements Callable<NetworkingParams> {
                 pinValue = "0";
                 pin.setValue(false);
             } else {
-                //Something went wrong. Setting no value. Server handles no value on GPIO pin as toggle.
+                //Something went wrong. Setting no value. Server handles no value on GPIO pin as toggle. (TextArea validation should not allow this line)
                 pinValue = "";
             }
             networkingParams = new ToggleGpioPin(pinCallback, getDateAndTime(), params, logger, pin, pinValue).call();

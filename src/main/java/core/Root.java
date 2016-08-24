@@ -225,14 +225,14 @@ public class Root extends Application {
             switch (selectedCommandMode) {
                 case MenuViewController.OBSERVABLE_I2C_TEXT:
                     if (validations.isHexaStringValid(command) && validations.isPhysicalAddressValid(address)) {
-                        networking.sendValueToI2CPin(pin, address, command);
+                        networking.sendValueToI2CPin(menuViewController, pin, address, command);
                     } else {
                         logger.log(MESSAGE_SEND_FAILED + ": Invalid input.");
                     }
                     return;
                 case MenuViewController.OBSERVABLE_SPI_TEXT:
                     if (validations.isHexaStringValid(command) && validations.isPhysicalAddressValid(address)) {
-                        networking.sendValueToSpiPin(pin, address, command);
+                        networking.sendValueToSpiPin(menuViewController, pin, address, command);
                     }
                     return;
                 default:
@@ -240,14 +240,14 @@ public class Root extends Application {
                     break;
             }
         } else {
-            networking.toggleGpioPin(getRequestStatusCallback(), pin, toggle);
+            networking.toggleGpioPin(menuViewController, getRequestStatusCallback(), pin, toggle);
             logger.log("Pin " + pin.getPinId() + " sent.");
         }
     }
 
     public void handleCheckBoxClick(ArrayList<Pin> pins) {
         if (menuViewController.isSendRequestCheckBoxChecked()) {
-            networking.updatePinsInRequestStatus(layout, pins);
+            networking.updatePinsInRequestStatus(menuViewController, layout, pins);
         }
     }
 

@@ -15,9 +15,12 @@ public class Networking {
 
     final static String DATE_FORMAT = "ddMMyyyyHHmmss";
     private final static int INITIAL_DELAY = 5;
+    private final static int KEEP_ALIVE_REQUEST_INITIAL_DELAY = 1000;
+    private final static int KEEP_ALIVE_REQUEST_INTERVAL = 5000;
 
     private ExecutorService connectionService;
     private ScheduledExecutorService scheduledService;
+    private ScheduledExecutorService keepAliveService;
     private Logger logger;
     private NetworkingParams params;
     private Validations validations;
@@ -33,16 +36,25 @@ public class Networking {
         this.logger = logger;
     }
 
-    public synchronized boolean connect(String ipAddress) {
+    public synchronized boolean connect(DisconnectCallback disconnectCallback, String ipAddress) {
         try {
             params = connectionService.submit(new Connect(ipAddress, logger)).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.log(e.toString());
         }
+
+        if (params.connected) {
+            keepAliveService = Executors.newSingleThreadScheduledExecutor();
+            keepAliveService.scheduleAtFixedRate(new KeepAlive(disconnectCallback, params), KEEP_ALIVE_REQUEST_INITIAL_DELAY, KEEP_ALIVE_REQUEST_INTERVAL, TimeUnit.MILLISECONDS);
+        }
+
         return params.connected;
     }
 
     public synchronized boolean disconnect() {
+        if (keepAliveService != null && !keepAliveService.isShutdown()) {
+            keepAliveService.shutdown();
+        }
         //already disconnected
         if (params != null) {
             try {
@@ -56,7 +68,7 @@ public class Networking {
         return false;
     }
 
-    public synchronized void toggleGpioPin(EmbeddedLayout callback, Pin pin, boolean toggle) {
+    public synchronized void toggleGpioPin(DisconnectCallback disconnectCallback, EmbeddedLayout callback, Pin pin, boolean toggle) {
         try {
             String pinValue;
             if (toggle) {
@@ -71,40 +83,34 @@ public class Networking {
             connectionService.submit(new ToggleGpioPin(callback, getDateAndTime(), params, logger, pin, pinValue)).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.log("Server did not responded on command.");
+            disconnectCallback.serverDisconnected();
         }
     }
 
-    public synchronized void sendValueToI2CPin(Pin pin, String address, String message) {
+    public synchronized void sendValueToI2CPin(DisconnectCallback disconnectCallback, Pin pin, String address, String message) {
         try {
             connectionService.submit(new SendValueToI2CPin(getDateAndTime(), params, logger, pin, address, message)).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.log("Server did not responded on command.");
+            disconnectCallback.serverDisconnected();
         }
     }
 
-    public synchronized void sendValueToSpiPin(Pin pin, String address, String message) {
+    public synchronized void sendValueToSpiPin(DisconnectCallback disconnectCallback, Pin pin, String address, String message) {
         try {
             connectionService.submit(new SendValueToSpiPin(getDateAndTime(), params, logger, pin, address, message)).get();
         } catch (InterruptedException | ExecutionException e) {
             logger.log("Server did not responded on command.");
+            disconnectCallback.serverDisconnected();
         }
     }
 
-    public synchronized void startRequestPinStatus(EmbeddedLayout callback, int refreshRate, final List<Pin> pins) {
+    public synchronized void startRequestPinStatus(DisconnectCallback disconnectCallback, EmbeddedLayout embeddedLayoutCallback, int refreshRate, final List<Pin> pins) {
         this.refreshRate = refreshRate;
         this.pins = pins;
         scheduledService = Executors.newSingleThreadScheduledExecutor();
-        final StartRequestPinStatus status = new StartRequestPinStatus(callback, params, logger, getDateAndTime(), pins);
-        scheduledService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    status.call();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, INITIAL_DELAY, refreshRate, TimeUnit.MILLISECONDS);
+        final StartRequestPinStatus status = new StartRequestPinStatus(disconnectCallback, embeddedLayoutCallback, params, logger, getDateAndTime(), pins);
+        scheduledService.scheduleAtFixedRate(status, INITIAL_DELAY, refreshRate, TimeUnit.MILLISECONDS);
     }
 
     public void cancelRequestPinStatus() {
@@ -113,18 +119,18 @@ public class Networking {
         }
     }
 
-    public synchronized void updateRequestRefreshRate(EmbeddedLayout callback, int refreshRate) {
+    public synchronized void updateRequestRefreshRate(DisconnectCallback disconnectCallback, EmbeddedLayout embeddedLayoutCallback, int refreshRate) {
         this.refreshRate = refreshRate;
         cancelRequestPinStatus();
         scheduledService = Executors.newSingleThreadScheduledExecutor();
-        startRequestPinStatus(callback, refreshRate, this.pins);
+        startRequestPinStatus(disconnectCallback, embeddedLayoutCallback, refreshRate, this.pins);
     }
 
-    public synchronized void updatePinsInRequestStatus(EmbeddedLayout callback, List<Pin> pins) {
+    public synchronized void updatePinsInRequestStatus(DisconnectCallback disconnectCallback, EmbeddedLayout embeddedLayoutCallback, List<Pin> pins) {
         this.pins = pins;
         cancelRequestPinStatus();
         scheduledService = Executors.newSingleThreadScheduledExecutor();
-        startRequestPinStatus(callback, this.refreshRate, pins);
+        startRequestPinStatus(disconnectCallback, embeddedLayoutCallback, this.refreshRate, pins);
     }
 
     public synchronized void sendMacro(EmbeddedLayout pinCallback, PopupDismiss popupCallback, List<String> commands) {

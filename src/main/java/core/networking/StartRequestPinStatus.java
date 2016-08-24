@@ -6,24 +6,26 @@ import core.ResponseParser;
 import javafx.application.Platform;
 import layouts.EmbeddedLayout;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
-class StartRequestPinStatus implements Callable<NetworkingParams> {
+class StartRequestPinStatus implements Runnable {
 
     private final static String PIN_REQUEST_CODE = "REQUEST:990";
     private final static String RESPONSE_SPLITTER = ";";
     private final static int MINIMUM_RESPONSE_LENGTH = 15;
 
-    private EmbeddedLayout callback;
+    private DisconnectCallback disconnectCallback;
+    private EmbeddedLayout embeddedLayoutCallback;
     private NetworkingParams params;
     private Logger logger;
     private String dateAndTime;
     private List<Pin> pinList;
 
-    StartRequestPinStatus(EmbeddedLayout callback, NetworkingParams params, Logger logger, String dateAndTime, List<Pin> pinList) {
-        this.callback = callback;
+    StartRequestPinStatus(DisconnectCallback disconnectCallback, EmbeddedLayout embeddedLayoutCallback, NetworkingParams params, Logger logger, String dateAndTime, List<Pin> pinList) {
+        this.disconnectCallback = disconnectCallback;
+        this.embeddedLayoutCallback = embeddedLayoutCallback;
         this.params = params;
         this.logger = logger;
         this.dateAndTime = dateAndTime;
@@ -31,7 +33,7 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
     }
 
     @Override
-    public NetworkingParams call() throws Exception {
+    public void run() {
         String pinsToRequest = "";
         if (pinList != null && !pinList.isEmpty()) {
             for (Pin pin : pinList) {
@@ -42,17 +44,15 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
                 }
             }
         }
-        String finalPinsToRequest = pinsToRequest;
-        Platform.runLater(() -> logger.log("Requesting status for pins: " + finalPinsToRequest));
         params.out.println(dateAndTime + PIN_REQUEST_CODE + pinsToRequest);
-        // TODO: 23.8.2016 ked neni server online tu je socket exception
-        // TODO: 23.8.2016 toto vsetko bude sucastou checkovania toho ci je server najprv online ked chce daco poslat a ked nie (nepride odpoved) tak disconnect
-        // TODO: 24.8.2016 cize treba na serveri poriesit error handling sposobom ze zla odpoved aby neodpojilo od servera
-        params.message = params.in.readLine();
-
-        Platform.runLater(() -> logger.log(params.message));
-        params = setColorOnPins();
-        return params;
+        try {
+            params.message = params.in.readLine();
+            Platform.runLater(() -> logger.log(params.message));
+            params = setColorOnPins();
+        } catch (IOException e) {
+            Platform.runLater(() -> logger.log("Failed to receive pin status."));
+            disconnectCallback.serverDisconnected();
+        }
     }
 
     private NetworkingParams setColorOnPins() {
@@ -83,7 +83,7 @@ class StartRequestPinStatus implements Callable<NetworkingParams> {
                 }
             }
         }
-        Platform.runLater(() -> callback.setColorOnPins(pins));
+        Platform.runLater(() -> embeddedLayoutCallback.setColorOnPins(pins));
         return params;
     }
 }

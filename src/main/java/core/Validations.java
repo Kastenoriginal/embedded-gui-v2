@@ -111,6 +111,7 @@ public class Validations {
                     String valueToSend = String.valueOf(content.charAt(GPIO_VALUE_POSITION));
                     validLine = valueToSend.equals(GPIO_OFF_VALUE) || valueToSend.equals(GPIO_ON_VALUE);
                 }
+                // Thread sleep command
             } else if (isOnlyDigitString(lineWithoutSemicolon) && line.endsWith(MACRO_LINE_END)) {
                 int contentValue = Integer.valueOf(lineWithoutSemicolon);
                 validLine = contentValue >= MIN_THREAD_SLEEP_TIME && contentValue <= MAX_THREAD_SLEEP_TIME;
